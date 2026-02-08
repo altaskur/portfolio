@@ -1,0 +1,74 @@
+---
+import AnimatedBackground from './AnimatedBackground.astro';
+---
+
+<div id="boot-screen" class="fixed inset-0 z-[999] flex flex-col items-start justify-end bg-black p-10 font-mono text-sm text-gray-400 font-bold overflow-hidden">
+    <div class="absolute inset-0 z-0">
+        <AnimatedBackground />
+    </div>
+    <div class="relative z-10">
+        <div id="boot-text" class="whitespace-pre-wrap"></div>
+        <div class="mt-2 text-accent animate-pulse">_</div>
+    </div>
+</div>
+
+<script>
+    import { gsap } from "gsap";
+
+    const bootText = [
+        "INITIALIZING DARK SYSTEMS PROTOCOL...",
+        "LOADING KERNEL MODULES: [GSAP, LENIS, TAILWIND]",
+        "ESTABLISHING SECURE CONNECTION...",
+        "LOC: ALICANTE, ES",
+        "USER: ALTASKUR",
+        "STATUS: ONLINE",
+        "BOOT SEQUENCE COMPLETE."
+    ];
+
+    const bootScreen = document.getElementById('boot-screen');
+    const textContainer = document.getElementById('boot-text');
+
+    const tl = gsap.timeline({
+        onComplete: () => {
+            gsap.to(bootScreen, {
+                yPercent: -100,
+                duration: 0.8,
+                ease: "power4.inOut",
+                delay: 0.2
+            });
+        }
+    });
+
+    bootText.forEach((line, index) => {
+        tl.to(textContainer, {
+            text: {
+                value: bootText.slice(0, index + 1).join("\n"),
+                delimiter: ""
+            },
+            duration: 0.1 + Math.random() * 0.3,
+            ease: "none",
+        }, "+=0.1");
+    });
+    
+    // Ensure TextPlugin is registered if using GSAP TextPlugin, otherwise use simple innerHTML appending
+    // Since we didn't install TextPlugin, let's use a simple function
+    
+    // OVERRIDE: Simple custom typewriter to avoid dependency issues if TextPlugin isn't installed
+    tl.clear();
+    
+    let currentLines = [];
+    
+    bootText.forEach((_line, i) => {
+        tl.call(() => {
+            if (textContainer) {
+                 const div = document.createElement('div');
+                 div.className = "text-green-500 mb-1";
+                 if (i > 4) div.className = "text-accent mb-1"; 
+                 div.innerText = "> " + bootText[i];
+                 textContainer.appendChild(div);
+            }
+        }, null, "+=0.15"); // Delay between lines
+    });
+
+    tl.to({}, {duration: 0.5}); // Final pause
+</script>

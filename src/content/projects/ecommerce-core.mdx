@@ -1,0 +1,18 @@
+---
+title: "E-commerce Microservices"
+description: "Scalable backend architecture for high-volume retail transactions."
+publishDate: 2025-11-20
+tags: ["Go", "gRPC", "Kubernetes"]
+repo: "https://github.com/altaskur/ecommerce-core"
+---
+
+## The Problem
+The legacy monolith was suffering from tight coupling and slow deployment cycles during Black Friday traffic spikes.
+
+## Technical Decisions
+- **Go**: For high concurrency and low memory footprint.
+- **gRPC**: For efficient inter-service communication.
+- **Event Sourcing**: To ensure data consistency across services.
+
+## Trade-offs
+Complexity increased significantly in terms of observability and distributed tracing, requiring a robust monitoring stack (Prometheus/Grafana).

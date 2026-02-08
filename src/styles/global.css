@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0A0A0A;
+  --color-surface: #161616;
+  --color-accent: #3B82F6;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-gray-100;
+  }
+
+  /* Desktop-only: Hide system cursor to use custom cursor exclusive */
+  @media (min-width: 768px) {
+    body, a, button, input, select, textarea, [role="button"], .cursor-pointer {
+      cursor: none !important;
+    }
+  }
+}

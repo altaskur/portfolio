@@ -1,0 +1,94 @@
+---
+import '../styles/global.css';
+import IntroPreloader from '../components/IntroPreloader.astro';
+import CustomCursor from '../components/CustomCursor.astro';
+import AnimatedBackground from '../components/AnimatedBackground.astro';
+import TerminalNav from '../components/TerminalNav.astro';
+import AITerminal from '../components/AITerminal.astro';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Isaac (Altaskur) - Frontend Developer. Building solid, accessible products with Angular, React, and TypeScript. Based in Alicante, Spain." />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="author" content="Isaac (Altaskur)" />
+		<meta name="keywords" content="Frontend Developer, Angular, React, TypeScript, JavaScript, Web Development, Alicante, Spain" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="canonical" href="https://altaskur.dev" />
+		<meta name="generator" content={Astro.generator} />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://altaskur.dev" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content="Frontend Developer. Building solid, accessible products with Angular, React, and TypeScript." />
+		<meta property="og:image" content="https://github.com/altaskur.png" />
+		<meta property="og:locale" content="en_US" />
+		
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content="https://altaskur.dev" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content="Frontend Developer. Building solid, accessible products with Angular, React, and TypeScript." />
+		<meta name="twitter:image" content="https://github.com/altaskur.png" />
+		
+		<title>{title}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+	</head>
+	<body class="bg-background text-gray-100 font-sans antialiased selection:bg-accent selection:text-white">
+        <!-- Skip to Content for Accessibility -->
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[200] focus:bg-accent focus:text-black focus:px-4 focus:py-2 focus:rounded-lg focus:font-bold">
+            Skip to main content
+        </a>
+        
+        <div class="fixed inset-0 z-0 pointer-events-none">
+            <AnimatedBackground />
+        </div>
+        
+        <!-- Global Scroll Progress Bar -->
+        <div class="fixed right-0 top-0 h-full w-1 bg-gray-900 z-50 hidden md:block">
+            <div id="scroll-progress" class="w-full bg-accent absolute top-0 left-0" style="height: 0%"></div>
+        </div>
+
+        <IntroPreloader />
+        <TerminalNav />
+        <AITerminal />
+        <CustomCursor />
+        <main id="main-content">
+		<slot />
+        </main>
+        <script>
+            import Lenis from 'lenis'
+
+            const lenis = new Lenis()
+
+            // Expose lenis to window for global control
+            window.lenis = lenis;
+
+            function raf(time: number) {
+              lenis.raf(time)
+              requestAnimationFrame(raf)
+            }
+
+            requestAnimationFrame(raf)
+
+            // Scroll Progress Logic
+            const progressBar = document.getElementById('scroll-progress');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (scrollTop / scrollHeight) * 100;
+                if(progressBar) progressBar.style.height = scrolled + "%";
+            });
+        </script>
+	</body>
+</html>

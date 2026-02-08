@@ -1,0 +1,99 @@
+---
+---
+<div id="custom-cursor" class="pointer-events-none fixed inset-0 z-[100] hidden md:block mix-blend-difference">
+  <div class="cursor-dot absolute left-0 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent"></div>
+  <div class="cursor-ring absolute left-0 top-0 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gray-500"></div>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+
+  const cursor = document.getElementById('custom-cursor');
+  const dot = cursor?.querySelector('.cursor-dot');
+  const ring = cursor?.querySelector('.cursor-ring');
+
+  if (cursor && dot && ring) {
+      // Hide initially to avoid flash at 0,0
+      gsap.set(cursor, { opacity: 0 });
+
+      // Create quickTo instances for performance
+      const moveDotX = gsap.quickTo(dot, "x", { duration: 0.1, ease: "power3" });
+      const moveDotY = gsap.quickTo(dot, "y", { duration: 0.1, ease: "power3" });
+      
+      const moveRingX = gsap.quickTo(ring, "x", { duration: 0.4, ease: "power3" });
+      const moveRingY = gsap.quickTo(ring, "y", { duration: 0.4, ease: "power3" });
+
+      let isVisible = false;
+
+      window.addEventListener("mousemove", (e) => {
+          if (!isVisible) {
+              gsap.to(cursor, { opacity: 1, duration: 0.2 });
+              isVisible = true;
+          }
+
+          moveDotX(e.clientX);
+          moveDotY(e.clientY);
+          moveRingX(e.clientX);
+          moveRingY(e.clientY);
+      });
+
+      // Hide when leaving window
+      document.addEventListener("mouseleave", () => {
+          gsap.to(cursor, { opacity: 0, duration: 0.2 });
+          isVisible = false;
+      });
+      document.addEventListener("mouseenter", () => {
+          gsap.to(cursor, { opacity: 1, duration: 0.2 });
+          isVisible = true;
+      });
+
+      // Hover Effects
+      const interactiveSelectors = 'a, button, .project-card, .bento-item, input, [role="button"]';
+      
+      const onHover = () => {
+          gsap.to(ring, { 
+              scale: 2.5, 
+              backgroundColor: "rgba(255, 255, 255, 0.1)", 
+              borderColor: "transparent",
+              duration: 0.3 
+          });
+          gsap.to(dot, { scale: 0, duration: 0.3 });
+      };
+
+      const onLeave = () => {
+          gsap.to(ring, { 
+              scale: 1, 
+              backgroundColor: "transparent", 
+              borderColor: "rgb(107, 114, 128)", // gray-500
+              duration: 0.3 
+          });
+          gsap.to(dot, { scale: 1, duration: 0.3 });
+      };
+
+      // Delegate hover events
+      document.body.addEventListener('mouseover', (e) => {
+          if ((e.target as HTMLElement).closest(interactiveSelectors)) {
+              onHover();
+          } else {
+              onLeave();
+          }
+      });
+  }
+</script>
+
+<style>
+  body {
+    cursor: none; /* Hide default cursor */
+  }
+  
+  a, button, input {
+      cursor: none; /* Ensure interactive elements don't show cursor */
+  }
+
+  /* Show default cursor on mobile/touch */
+  @media (pointer: coarse) {
+      body { cursor: auto; }
+      #custom-cursor { display: none; }
+      a, button, input { cursor: pointer; }
+  }
+</style>

@@ -1,0 +1,562 @@
+---
+---
+
+<!-- AI Terminal Modal -->
+<div id="ai-terminal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 md:p-8 overflow-hidden" style="cursor: default;">
+    <!-- Backdrop -->
+    <div id="ai-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    
+    <!-- Terminal Window -->
+    <div id="ai-window" class="relative w-full max-w-2xl rounded-xl border border-gray-700 bg-gray-900/95 shadow-2xl backdrop-blur-xl overflow-hidden transform scale-95 opacity-0 flex flex-col" style="max-height: 80vh; cursor: default;">
+        <!-- Terminal Header -->
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-black/50 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="flex gap-1.5">
+                    <button id="ai-close-btn" class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer" title="Close (ESC)"></button>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+                </div>
+                <span class="font-mono text-xs text-gray-400">altaskur@portfolio:~/ask-me</span>
+            </div>
+            <button id="ai-close-x" class="text-gray-500 hover:text-white transition-colors p-1" title="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Chat Messages -->
+        <div id="ai-messages" class="flex-1 p-4 space-y-4 overflow-y-auto scroll-smooth" data-lenis-prevent>
+            <!-- Messages will be added here by JS -->
+        </div>
+        
+        <!-- Input Area -->
+        <div class="border-t border-gray-800 p-4 bg-black/30 shrink-0">
+            <form id="ai-form" class="flex items-center gap-3">
+                <span class="text-accent font-mono text-sm shrink-0">visitor:~$</span>
+                <input 
+                    type="text" 
+                    id="ai-input" 
+                    placeholder="Type a command or question..."
+                    class="flex-1 bg-transparent border-none outline-none text-white font-mono text-sm placeholder:text-gray-600"
+                    autocomplete="off"
+                />
+                <button type="submit" class="text-accent hover:text-white transition-colors p-1" aria-label="Send">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+            <p class="text-[10px] text-gray-600 mt-2 font-mono">Press ESC to close • Type "help" for commands</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    interface ChatMessage {
+        role: 'user' | 'assistant';
+        content: string;
+    }
+
+    const aiTerminal = document.getElementById('ai-terminal');
+    const aiBackdrop = document.getElementById('ai-backdrop');
+    const aiWindow = document.getElementById('ai-window');
+    const aiCloseBtn = document.getElementById('ai-close-btn');
+    const aiCloseX = document.getElementById('ai-close-x');
+    const aiForm = document.getElementById('ai-form') as HTMLFormElement;
+    const aiInput = document.getElementById('ai-input') as HTMLInputElement;
+    const aiMessages = document.getElementById('ai-messages');
+
+    let chatHistory: ChatMessage[] = [];
+    let isOpen = false;
+
+    // Multiple responses per category for variety
+    const responses: Record<string, string[]> = {
+        'help': [
+            `📋 Available commands:
+
+• help - Show available commands
+• about - Learn about Isaac
+• skills - Technical skills
+• projects - Featured projects  
+• experience - Work history
+• contact - How to reach me
+• blog - Recent articles
+• stack - Tech stack
+• hobbies - Personal interests
+• clear - Clear chat
+
+Just type a command or ask me anything! 🚀`,
+        ],
+        
+        'about': [
+            `Isaac (Altaskur) is a Frontend Developer specializing in Angular. Based in Alicante, Spain, he focuses on accessible, clean code and scalable architectures. 🇪🇸`,
+            `Hey! Isaac here. I'm a collaborative Frontend Dev who values empathy, clear communication, and code quality. Driven by curiosity and a passion for great UX! 🚀`,
+            `I'm Isaac, a Spanish developer with a strong focus on problem-solving and cross-team collaboration. Quality, accessibility, and meaningful code are my priorities! ✨`,
+        ],
+        
+        'skills': [
+            `🛠️ My Technical Arsenal:
+
+Core: HTML5, CSS3 (Flexbox/Grid), JS (ES6+), TypeScript
+Frameworks: Angular 20+ (Main), React (Familiar), RxJS, NgRx
+Testing: Jest, Testing Library
+Tools: Git, Webpack/Vite, SonarQube, Figma
+
+Plus a focus on Accessibility (a11y) and Responsive Design! 💡`,
+            `⚡ Key Skills:
+
+• Angular Ecosystem (Signal, RxJS, NgRx)
+• Clean Code, CDD & UI/UX Best Practices
+• REST APIs, JSON, Fetch/Axios
+• CI/CD Pipelines & Agile Workflows
+
+I care about performance and maintainability! 🔧`,
+            `Soft Skills are just as important! 🧠
+
+• Critical thinking & Problem solving
+• Empathy & Cross-team collaboration
+• Clear technical communication
+• Consistency & Curiosity
+
+And yes, I use Figma too! 🎨`,
+        ],
+        
+        'projects': [
+            `🚀 Some things I've built:
+
+1. OpenTimeTracker - Time tracking app (TypeScript)
+2. This Portfolio - Built with Astro
+3. Lateteriaelda - E-commerce with Vue.js
+
+Check the Projects section for more! 📁`,
+            `Featured projects:
+
+• OpenTimeTracker: Open-source time management
+• Portfolio 2026: You're looking at it! 
+• Various e-commerce & web apps
+
+I'm always working on something new! 🛠️`,
+            `My recent work includes this portfolio (Astro + animations), an open-source time tracker, and several Vue.js projects. Scroll down to see more! 👇`,
+        ],
+        
+        'experience': [
+            `💼 Angular Developer:
+
+• Developing scalable Angular applications
+• Utilizing Scrum/Agile workflows
+• Code reviews & Pair programming
+• Focus on long-term maintainability
+
+Collaboration is key! 🤝`,
+            `Professional Journey: 
+
+Current: Angular Dev
+Focus: Enterprise apps, Clean Code, Performance
+
+I love understanding the context and purpose behind every feature! 🎯`,
+            `Currently building with Angular!
+
+I bring critical thinking, accessibility focus, and a collaborative mindset to every project. Plus, I handle end-to-end testing and optimization! 🚀`,
+        ],
+        
+        'contact': [
+            `📬 Let's get social!
+
+GitHub: github.com/altaskur
+LinkedIn: linkedin.com/in/isaac-julián/
+Website: altaskur.dev
+
+Let's discuss technology and great products! 👋`,
+            `Want to chat? Here's how:
+
+• GitHub → github.com/altaskur
+• LinkedIn → linkedin.com/in/isaac-julián/
+
+Don't be a stranger! ✉️`,
+            `Reach out anytime! 
+
+GitHub or LinkedIn (linkedin.com/in/isaac-julián/). Whether it's a job opportunity, collab, or just saying hi – I'm all ears! 🎧`,
+        ],
+        
+        'stack': [
+            `⚡ This site runs on Astro, but my daily stack is:
+
+• Angular 20+ (Signals & Clean Arch)
+• Jest / Testing Library
+• CI/CD (GitHub Actions / GitLab CI)
+• Figma for design hand-off
+
+Fullstack capable with Node.js! 🅰️`,
+            `My professional ecosystem:
+
+Angular ecosystem + TypeScript
+State: Signals / NgRx
+Styles: SCSS / Tailwind (Personal)
+Quality: SonarQube, ESLint, Prettier
+
+Quality first! 🛡️`,
+            `Tech behind this site? Astro! 
+
+But at work I engineer with Angular, RxJS, and strict TypeScript. I also set up pipelines, handle code reviews, and ensure a11y standards. ⚡`,
+        ],
+        
+        'hobbies': [
+            `✨ When I'm not coding:
+
+• Reading tech blogs & news
+• Contributing to open source
+• Exploring new UI/UX trends
+• Lots of coffee ☕
+
+Continuous learning is my vibe! 🎯`,
+            `Outside of work? 
+
+I read about tech, watch coding tutorials, and drink way too much coffee. Also love discovering new music to code to! 🎵`,
+            `My hobbies: Open source contributions, tech podcasts, and exploring new frameworks just for fun! 🚀`,
+        ],
+        
+        'hello': [
+            `Hey there! 👋 Welcome! I'm here to tell you about Isaac. Type "help" to see what I can do!`,
+            `Hello! 👋 Nice to meet you! Ask me anything about Isaac's work, or type "help" for commands!`,
+            `Hi! 👋 Welcome to the portfolio! I'm your AI guide. Try typing "help" to get started!`,
+        ],
+        
+        'hi': [
+            `Hey! 👋 What would you like to know about Isaac?`,
+            `Hello there! 👋 Type "help" to see available commands!`,
+            `Hi! 👋 Ready to explore? Ask me anything!`,
+        ],
+        
+        'hola': [
+            `¡Hola! 👋 Bienvenido! I respond in English, but feel free to ask anything!`,
+            `¡Hey! 👋 ¿Qué tal? Type "help" to see what I can tell you about Isaac!`,
+            `¡Buenas! 👋 Welcome! Ask me about skills, projects, or anything else!`,
+        ],
+
+        'blog': [
+            `📝 Latest articles from Isaac's Dev.to:
+
+• Angular Accessibility
+• Scalable TS Patterns
+• Community & Streaming
+
+Check the Blog section to see them all! 📖`,
+            `You can find Isaac's technical writing in the Blog section. He regularly posts about Angular, TypeScript, and software architecture on Dev.to! ✍️`,
+        ],
+        'clear': [
+            `_CLEAR_`,
+        ],
+    };
+
+    // Keywords for smart matching (English + Spanish)
+    const keywordMap: { keywords: string[], category: string }[] = [
+        { keywords: ['who', 'about', 'isaac', 'altaskur', 'yourself', 'quien', 'quién', 'sobre', 'presentate', 'preséntate', 'cuentame', 'cuéntame', 'eres'], category: 'about' },
+        { keywords: ['skill', 'technology', 'tech', 'know', 'programming', 'language', 'code', 'angular', 'signals', 'soft skills', 'figma', 'testing', 'jest', 'habilidad', 'tecnologia', 'tecnología', 'sabe', 'sabes', 'lenguaje', 'programa', 'blandas'], category: 'skills' },
+        { keywords: ['project', 'portfolio', 'made', 'built', 'create', 'proyecto', 'creado', 'hecho', 'construido'], category: 'projects' },
+        { keywords: ['experience', 'job', 'career', 'professional', 'history', 'company', 'worked', 'experiencia', 'trabajo', 'carrera', 'profesional', 'trabajado', 'empresa', 'laboral', 'trayectoria'], category: 'experience' },
+        { keywords: ['contact', 'email', 'reach', 'hire', 'message', 'talk', 'contacto', 'correo', 'contratar', 'mensaje', 'hablar', 'contactar'], category: 'contact' },
+        { keywords: ['stack', 'framework', 'tool', 'astro', 'vue', 'react', 'using', 'qa', 'quality', 'sonar', 'git', 'herramienta', 'usa', 'usas', 'utiliza', 'calidad'], category: 'stack' },
+        { keywords: ['hobby', 'hobbies', 'free time', 'fun', 'like', 'enjoy', 'interest', 'do for fun', 'pasatiempo', 'tiempo libre', 'gusta', 'aficion', 'afición', 'diversion', 'diversión'], category: 'hobbies' },
+        { keywords: ['experience', 'job', 'career', 'professional', 'history', 'company', 'worked', 'experiencia', 'trabajo', 'carrera', 'profesional', 'trabajado', 'empresa', 'laboral', 'trayectoria'], category: 'experience' },
+        { keywords: ['contact', 'email', 'reach', 'hire', 'message', 'talk', 'contacto', 'correo', 'contratar', 'mensaje', 'hablar', 'contactar'], category: 'contact' },
+        { keywords: ['stack', 'framework', 'tool', 'astro', 'vue', 'react', 'using', 'herramienta', 'usa', 'usas', 'utiliza'], category: 'stack' },
+        { keywords: ['blog', 'article', 'post', 'writing', 'dev.to', 'write', 'read', 'artículo', 'publicación', 'leer', 'escribir'], category: 'blog' },
+        { keywords: ['hobby', 'hobbies', 'free time', 'fun', 'like', 'enjoy', 'interest', 'do for fun', 'pasatiempo', 'tiempo libre', 'gusta', 'aficion', 'afición', 'diversion', 'diversión'], category: 'hobbies' },
+    ];
+
+    // Default responses for unknown inputs
+    const defaultResponses = [
+        `Hmm, not sure about that! Try "help" to see what I can tell you about. 🤔`,
+        `Interesting question! I know about Isaac's skills, projects, and experience. Type "help" for options! 💡`,
+        `I'm focused on this portfolio. Try asking about projects, skills, or how to contact Isaac! 🚀`,
+        `That's beyond my knowledge! But I can tell you about Isaac's work. Type "help"! 📚`,
+        `Curious one, aren't you? 😄 Try "skills", "projects", or "about" to learn more!`,
+    ];
+
+    // Get random response from category
+    function getRandomResponse(category: string): string {
+        const options = responses[category];
+        if (!options || options.length === 0) return defaultResponses[0];
+        return options[Math.floor(Math.random() * options.length)];
+    }
+
+    // Find best response
+    function findResponse(message: string): string {
+        const lowerMessage = message.toLowerCase().trim();
+        
+        // Check exact command matches first
+        if (responses[lowerMessage]) {
+            return getRandomResponse(lowerMessage);
+        }
+        
+        // Check keyword matches
+        for (const { keywords, category } of keywordMap) {
+            if (keywords.some(keyword => lowerMessage.includes(keyword))) {
+                return getRandomResponse(category);
+            }
+        }
+        
+        // Return random default response
+        return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+    }
+
+    // Add message to chat
+    function addMessage(role: 'user' | 'assistant', content: string, isTyping = false) {
+        if (!aiMessages) return;
+        
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'ai-message';
+        
+        const prompt = role === 'user' 
+            ? '<span class="text-blue-400 font-mono text-sm">visitor:~$</span>'
+            : '<span class="text-accent font-mono text-sm">ai:~$</span>';
+        
+        msgDiv.innerHTML = `
+            ${prompt}
+            <p class="text-gray-300 mt-1 whitespace-pre-wrap leading-relaxed ${isTyping ? 'ai-typing' : ''}">${content}</p>
+        `;
+        
+        aiMessages.appendChild(msgDiv);
+        scrollToBottom();
+        
+        return msgDiv;
+    }
+
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        if (aiMessages) {
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+        }
+    }
+
+    // Typewriter effect
+    async function typeMessage(element: HTMLElement, text: string) {
+        element.textContent = '';
+        const chars = text.split('');
+        for (let i = 0; i < chars.length; i++) {
+            element.textContent += chars[i];
+            scrollToBottom();
+            // Faster for punctuation, slower for normal chars
+            const delay = ['.', '!', '?', '\n'].includes(chars[i]) ? 50 : 12;
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+
+    // Clear all messages
+    function clearMessages() {
+        if (aiMessages) {
+            aiMessages.innerHTML = '';
+            showWelcome();
+        }
+    }
+
+    // Show welcome message with commands
+    function showWelcome() {
+        if (!aiMessages) return;
+        
+        aiMessages.innerHTML = `
+            <div class="ai-message">
+                <span class="text-accent font-mono text-sm">system:~$</span>
+                <p class="text-gray-300 mt-1">
+                    👋 Hey! I'm an AI assistant for Isaac's portfolio.
+                </p>
+            </div>
+            <div class="ai-message mt-3">
+                <span class="text-gray-500 font-mono text-sm">Quick commands:</span>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <button class="cmd-btn" data-cmd="about">about</button>
+                    <button class="cmd-btn" data-cmd="skills">skills</button>
+                    <button class="cmd-btn" data-cmd="projects">projects</button>
+                    <button class="cmd-btn" data-cmd="experience">experience</button>
+                    <button class="cmd-btn" data-cmd="contact">contact</button>
+                    <button class="cmd-btn" data-cmd="stack">stack</button>
+                    <button class="cmd-btn" data-cmd="hobbies">hobbies</button>
+                </div>
+                <p class="text-gray-500 text-xs mt-3">Click a button or type anything to ask!</p>
+            </div>
+        `;
+        
+        // Add click handlers to command buttons
+        document.querySelectorAll('.cmd-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cmd = (btn as HTMLElement).dataset.cmd;
+                if (cmd) sendMessage(cmd);
+            });
+        });
+    }
+
+    // Open terminal
+    function openTerminal() {
+        if (!aiTerminal || !aiWindow) return;
+        isOpen = true;
+        aiTerminal.classList.remove('hidden');
+        aiTerminal.classList.add('flex');
+        
+        // Block body scroll
+        // Block body scroll
+        document.body.style.overflow = 'hidden';
+        if ((window as any).lenis) (window as any).lenis.stop();
+        
+        // Show welcome if empty
+        if (aiMessages && aiMessages.children.length === 0) {
+            showWelcome();
+        }
+        
+        // Animate in
+        requestAnimationFrame(() => {
+            aiWindow.style.transform = 'scale(1)';
+            aiWindow.style.opacity = '1';
+            aiInput?.focus();
+        });
+    }
+
+    // Close terminal
+    function closeTerminal() {
+        if (!aiTerminal || !aiWindow) return;
+        isOpen = false;
+        
+        // Restore body scroll
+        // Restore body scroll
+        document.body.style.overflow = '';
+        if ((window as any).lenis) (window as any).lenis.start();
+        
+        aiWindow.style.transform = 'scale(0.95)';
+        aiWindow.style.opacity = '0';
+        
+        setTimeout(() => {
+            aiTerminal.classList.add('hidden');
+            aiTerminal.classList.remove('flex');
+        }, 200);
+    }
+
+    // Send message (simulated AI)
+    async function sendMessage(message: string) {
+        if (!message.trim()) return;
+        
+        // Add user message
+        addMessage('user', message);
+        chatHistory.push({ role: 'user', content: message });
+        
+        // Get response
+        const response = findResponse(message);
+        
+        // Handle clear command
+        if (response === '_CLEAR_') {
+            clearMessages();
+            return;
+        }
+        
+        // Add loading indicator
+        const loadingDiv = addMessage('assistant', '▌', true);
+        const loadingP = loadingDiv?.querySelector('p');
+        
+        // Simulate thinking delay
+        await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 400));
+        
+        // Type out response
+        if (loadingP) {
+            await typeMessage(loadingP as HTMLElement, response);
+        }
+        
+        chatHistory.push({ role: 'assistant', content: response });
+    }
+
+    // Event listeners
+    aiCloseBtn?.addEventListener('click', closeTerminal);
+    aiCloseX?.addEventListener('click', closeTerminal);
+    aiBackdrop?.addEventListener('click', closeTerminal);
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) {
+            closeTerminal();
+        }
+    });
+    
+    aiForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = aiInput?.value || '';
+        if (aiInput) aiInput.value = '';
+        sendMessage(message);
+    });
+
+    // Global function to open terminal
+    (window as any).openAITerminal = openTerminal;
+    
+    // Initialize
+    if (aiWindow) {
+        aiWindow.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
+    }
+</script>
+
+<style>
+    #ai-messages {
+        scrollbar-width: thin;
+        scrollbar-color: #374151 transparent;
+        overscroll-behavior: contain;
+    }
+    
+    #ai-terminal {
+        overscroll-behavior: contain;
+    }
+    
+    #ai-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #ai-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    #ai-messages::-webkit-scrollbar-thumb {
+        background: #374151;
+        border-radius: 3px;
+    }
+    
+    #ai-messages::-webkit-scrollbar-thumb:hover {
+        background: #4b5563;
+    }
+
+    .ai-message {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .cmd-btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+        font-family: ui-monospace, monospace;
+        border-radius: 0.5rem;
+        border: 1px solid #374151;
+        color: #9ca3af;
+        background: transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .cmd-btn:hover {
+        border-color: var(--accent, #10b981);
+        color: var(--accent, #10b981);
+        background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .ai-typing p {
+        animation: blink 0.5s infinite;
+    }
+    
+    @keyframes blink {
+        50% { opacity: 0.5; }
+    }
+</style>

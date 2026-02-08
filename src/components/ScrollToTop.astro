@@ -1,0 +1,68 @@
+---
+---
+
+<!-- Floating Scroll to Top Button -->
+<button 
+    id="scroll-top-btn" 
+    class="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gray-900 border border-gray-700 text-accent shadow-lg transition-all hover:scale-110 hover:border-accent hover:shadow-accent/20 opacity-0 translate-y-10 pointer-events-none focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-black"
+    aria-label="Back to top"
+>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+</button>
+
+<script>
+    import { gsap } from "gsap";
+
+    const initScrollToTop = () => {
+        const btn = document.getElementById('scroll-top-btn');
+        if (!btn) return;
+
+        let isVisible = false;
+
+        // Show/hide based on scroll position
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            
+            if (scrollY > 500 && !isVisible) {
+                gsap.to(btn, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.3,
+                    ease: 'power2.out',
+                    onStart: () => {
+                        btn.classList.remove('pointer-events-none');
+                    }
+                });
+                isVisible = true;
+            } else if (scrollY <= 500 && isVisible) {
+                gsap.to(btn, {
+                    opacity: 0,
+                    y: 10,
+                    duration: 0.3,
+                    ease: 'power2.out',
+                    onComplete: () => {
+                        btn.classList.add('pointer-events-none');
+                    }
+                });
+                isVisible = false;
+            }
+        });
+
+        // Scroll to top on click
+        btn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    };
+
+    document.addEventListener('astro:page-load', initScrollToTop);
+    document.addEventListener('DOMContentLoaded', initScrollToTop);
+    
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initScrollToTop, 100);
+    }
+</script>

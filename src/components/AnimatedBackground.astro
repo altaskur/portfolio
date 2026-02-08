@@ -1,0 +1,130 @@
+---
+---
+
+<canvas id="hero-canvas" class="absolute inset-0 z-0 opacity-60 pointer-events-none"></canvas>
+
+<script>
+    const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    
+    let width = 0;
+    let height = 0; 
+    let particles = [];
+    
+    // Mouse tracking for subtle parallax
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Event Listeners
+    window.addEventListener('mousemove', (e) => {
+        // Calculate mouse position relative to center of screen (-0.5 to 0.5)
+        mouseX = (e.clientX - width / 2) / width;
+        mouseY = (e.clientY - height / 2) / height;
+    });
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        initParticles();
+    }
+
+    class Particle {
+        x: number;
+        y: number;
+        vx: number;
+        vy: number;
+        size: number;
+        
+        // Target velocity based on mouse
+        targetVx: number;
+        targetVy: number;
+
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.5; 
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.size = Math.random() * 2.5 + 0.5;
+            
+            // Random natural drift
+            this.targetVx = this.vx;
+            this.targetVy = this.vy;
+        }
+
+        update() {
+            // Subtle Parallax: Mouse influences velocity slightly
+            const mouseForceX = -mouseX * 0.5; 
+            const mouseForceY = -mouseY * 0.5;
+
+            // Smoothly interpolate current velocity towards (natural drift + mouse influence)
+            this.vx += ((this.targetVx + mouseForceX) - this.vx) * 0.05;
+            this.vy += ((this.targetVy + mouseForceY) - this.vy) * 0.05;
+
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0) this.x = width;
+            if (this.x > width) this.x = 0;
+            if (this.y < 0) this.y = height;
+            if (this.y > height) this.y = 0;
+        }
+
+        draw() {
+            if (!ctx) return;
+            // Draw particle with maximum opacity
+            ctx.fillStyle = `rgba(59, 130, 246, 0.9)`; // High visibility
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        const particleCount = Math.min(Math.floor(width * 0.1), 80); 
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        // Draw connections with higher opacity
+        ctx.lineWidth = 0.5;
+        particles.forEach((p1, i) => {
+            for (let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dx = p1.x - p2.x;
+                const dy = p1.y - p2.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const connectRange = 180;
+
+                if (dist < connectRange) {
+                    ctx.beginPath();
+                    // Increased opacity multiplier significantly
+                    const opacity = (1 - dist / connectRange) * 0.8; // Increased from 0.35 to 0.8
+                    ctx.strokeStyle = `rgba(59, 130, 246, ${opacity})`; 
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    // Event Listeners - resize only
+    window.addEventListener('resize', resize);
+    resize();
+    animate();
+</script>

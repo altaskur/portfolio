@@ -1,0 +1,19 @@
+---
+interface Props {
+	class?: string;
+    title?: string;
+    icon?: string;
+}
+
+const { class: className, title, icon } = Astro.props;
+---
+
+<div class={`bento-item relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-colors hover:border-gray-700 ${className}`}>
+    { title && (
+        <div class="flex items-center gap-2 mb-4 text-gray-400">
+             {icon && <span class="text-accent" set:html={icon} />}
+            <h3 class="text-sm font-mono font-bold uppercase tracking-wider">{title}</h3>
+        </div>
+    )}
+	<slot />
+</div>

@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+const featuredProjects = projects.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()).slice(0, 3);
+---
+
+<section id="projects" class="px-4 py-20 md:px-10">
+    <div class="mb-16 flex items-end justify-between">
+        <h2 class="text-3xl font-bold text-white md:text-5xl"><span class="text-accent">03.</span> Selected Work</h2>
+        <span class="hidden font-mono text-sm text-gray-500 md:block">/// CASE STUDIES</span>
+    </div>
+
+    <div class="space-y-32">
+        {featuredProjects.map((project, index) => (
+            <article class="project-card relative grid gap-10 md:grid-cols-2 items-center opacity-0 translate-y-20">
+                <div class={`space-y-6 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                    <div class="flex items-center gap-4 text-accent font-mono text-sm">
+                        <span>0{index + 1}</span>
+                        <span class="h-px w-10 bg-accent"></span>
+                        <span>{project.data.tags.join(" / ")}</span>
+                    </div>
+                    
+                    <h3 class="text-3xl font-bold text-white md:text-4xl">{project.data.title}</h3>
+                    <p class="text-lg text-gray-400">{project.data.description}</p>
+                    
+                    <div class="prose prose-invert prose-sm text-gray-400 max-w-none">
+                         <!-- Render a snippet or key points manually if needed, or link to full case study -->
+                         <p>Read the full case study for technical details on {project.data.title}.</p>
+                    </div>
+
+                    <div class="flex gap-4 pt-4">
+                        {project.data.repo && (
+                            <a href={project.data.repo} target="_blank" class="text-sm font-bold text-white hover:text-accent transition-colors">
+                                GITHUB_REPO ↗
+                            </a>
+                        )}
+                        {project.data.live && (
+                            <a href={project.data.live} target="_blank" class="text-sm font-bold text-white hover:text-accent transition-colors">
+                                LIVE_DEMO ↗
+                            </a>
+                        )}
+                    </div>
+                </div>
+
+                <div class={`relative aspect-video overflow-hidden rounded-lg bg-gray-900 border border-gray-800 group ${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                    <!-- Placeholder for Project Image -->
+                    <div class="absolute inset-0 flex items-center justify-center bg-gray-800/50 group-hover:bg-gray-800/30 transition-colors">
+                         <span class="font-mono text-2xl text-gray-600 group-hover:text-accent transition-colors">./project_preview.png</span>
+                    </div>
+                </div>
+            </article>
+        ))}
+    </div>
+</section>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const projects = document.querySelectorAll('.project-card');
+
+    projects.forEach((project) => {
+        gsap.to(project, {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: project,
+                start: "top 80%",
+                end: "bottom 20%",
+                toggleActions: "play none none reverse"
+            }
+        });
+    });
+</script>

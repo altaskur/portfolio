@@ -1,0 +1,404 @@
+---
+import BentoItem from './BentoItem.astro';
+
+// GitHub Config
+const GITHUB_USERNAME = "altaskur";
+
+// Language colors (GitHub style)
+const langColors: Record<string, string> = {
+    TypeScript: '#3178c6',
+    JavaScript: '#f1e05a',
+    HTML: '#e34c26',
+    CSS: '#563d7c',
+    Vue: '#41b883',
+    Astro: '#ff5a03',
+    Python: '#3572A5',
+    Java: '#b07219',
+    PHP: '#4F5D95',
+    default: '#8b949e'
+};
+
+// Default/fallback data - will be updated by client-side JS with cached data
+const profile = {
+    avatar: `https://github.com/${GITHUB_USERNAME}.png`,
+    name: "Isaac",
+    bio: "Frontend Developer",
+    repos: 90,
+    followers: 150,
+    years: (new Date().getFullYear() - 2020),
+    url: `https://github.com/${GITHUB_USERNAME}`
+};
+
+const recentRepos = [
+    { name: "OpenTimeTracker", lang: "TypeScript", stars: 2, url: `https://github.com/${GITHUB_USERNAME}/OpenTimeTracker` },
+    { name: "Portfolio", lang: "Astro", stars: 1, url: `https://github.com/${GITHUB_USERNAME}/Portfolio` },
+    { name: "Lateteriaelda", lang: "Vue", stars: 0, url: `https://github.com/${GITHUB_USERNAME}/Lateteriaelda` }
+];
+
+const topLanguages = [
+    { name: "TypeScript", percentage: 35, color: langColors.TypeScript },
+    { name: "JavaScript", percentage: 25, color: langColors.JavaScript },
+    { name: "Vue", percentage: 20, color: langColors.Vue },
+    { name: "HTML", percentage: 12, color: langColors.HTML },
+    { name: "CSS", percentage: 8, color: langColors.CSS }
+];
+---
+
+<section id="dashboard" class="px-4 py-20 md:px-10">
+    <h2 class="mb-10 text-3xl font-bold text-white md:text-4xl">
+        <span class="text-accent">02.</span> GitHub
+    </h2>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6">
+
+        <!-- ROW 1: Profile (1) + Recent Activity (1) + Languages (1) -->
+        
+        <!-- Profile Card -->
+        <BentoItem class="md:col-span-1 group" title="">
+            <a id="github-profile-link" href={profile.url} target="_blank" rel="noopener noreferrer" class="flex flex-col h-full">
+                <div class="flex items-center gap-4 mb-4">
+                    <img 
+                        id="github-avatar"
+                        src={profile.avatar} 
+                        alt={profile.name}
+                        class="w-16 h-16 rounded-full border-2 border-gray-700 group-hover:border-accent transition-colors"
+                    />
+                    <div>
+                        <h3 id="github-name" class="text-lg font-bold text-white group-hover:text-accent transition-colors">{profile.name}</h3>
+                        <p class="text-xs text-gray-500 font-mono">@{GITHUB_USERNAME}</p>
+                    </div>
+                </div>
+                <p id="github-bio" class="text-sm text-gray-400 mb-4 flex-grow">{profile.bio}</p>
+                <div class="grid grid-cols-3 gap-2 text-center border-t border-gray-800 pt-4">
+                    <div>
+                        <span id="github-repos" class="block text-lg font-bold text-white">{profile.repos}</span>
+                        <span class="text-[10px] text-gray-500 uppercase">Repos</span>
+                    </div>
+                    <div>
+                        <span id="github-followers" class="block text-lg font-bold text-white">{profile.followers}</span>
+                        <span class="text-[10px] text-gray-500 uppercase">Followers</span>
+                    </div>
+                    <div>
+                        <span class="block text-lg font-bold text-white">{profile.years}+</span>
+                        <span class="text-[10px] text-gray-500 uppercase">Years</span>
+                    </div>
+                </div>
+            </a>
+        </BentoItem>
+
+        <!-- Recent Activity -->
+        <BentoItem class="md:col-span-1" title="Recent Activity">
+            <div id="github-recent-repos" class="space-y-3 h-full">
+                {recentRepos.map(repo => (
+                    <a href={repo.url} target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-gray-800/50 hover:border-accent/50 hover:bg-gray-800/30 transition-all group/item">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-2 h-2 rounded-full shrink-0" style={`background-color: ${langColors[repo.lang] || langColors.default}`}></div>
+                            <span class="text-sm text-gray-300 group-hover/item:text-white transition-colors truncate">{repo.name}</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
+                            <span>★</span>
+                            <span>{repo.stars}</span>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </BentoItem>
+
+        <!-- Top Languages -->
+        <BentoItem class="md:col-span-1" title="Top Languages">
+            <div id="github-languages" class="space-y-3 h-full">
+                {topLanguages.map(lang => (
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full shrink-0" style={`background-color: ${lang.color}`}></div>
+                        <span class="text-sm text-gray-300 flex-grow">{lang.name}</span>
+                        <div class="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full" style={`width: ${lang.percentage}%; background-color: ${lang.color}`}></div>
+                        </div>
+                        <span class="text-[10px] text-gray-500 w-8 text-right">{lang.percentage}%</span>
+                    </div>
+                ))}
+            </div>
+        </BentoItem>
+
+        <!-- ROW 2: Contribution Graph (Full Width) -->
+        <BentoItem class="md:col-span-3 group cursor-pointer hover:border-accent/50 transition-colors" title="">
+            <a href={profile.url} target="_blank" rel="noopener noreferrer" class="flex flex-col h-full relative">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-accent text-black px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">GIT</span>
+                        <span class="text-sm font-bold text-white">Contribution Graph</span>
+                    </div>
+                    <span class="text-[10px] text-gray-500 font-mono group-hover:text-gray-300 transition-colors">
+                        View full history →
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-end w-full flex-grow gap-[2px] opacity-50 group-hover:opacity-100 transition-opacity">
+                    {Array.from({ length: 52 }).map((_, weekIndex) => (
+                        <div class="flex flex-col gap-[2px] flex-1">
+                            {Array.from({ length: 7 }).map((_, dayIndex) => {
+                                const rand = Math.random();
+                                const opacity = rand > 0.7 ? (rand * 0.7 + 0.3) : 0;
+                                return (
+                                    <div 
+                                        class={`w-full aspect-square rounded-[2px] ${opacity > 0 ? 'bg-accent' : 'bg-gray-800/30'}`}
+                                        style={opacity > 0 ? `opacity: ${opacity.toFixed(2)}` : ''}
+                                    ></div>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </div>
+            </a>
+        </BentoItem>
+
+    </div>
+</section>
+
+<script>
+    import { gsap } from 'gsap';
+    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // GitHub Cache Configuration
+    const GITHUB_USERNAME = 'altaskur';
+    const EXCLUDED_REPOS = ['Apuntes', 'Express.js-Talleres-Donweb', 'altaskur'];
+    const CACHE_KEY = 'github_data_cache';
+    const CACHE_TTL = 60 * 60 * 1000; // 1 hour in milliseconds
+
+    const langColors: Record<string, string> = {
+        TypeScript: '#3178c6',
+        JavaScript: '#f1e05a',
+        HTML: '#e34c26',
+        CSS: '#563d7c',
+        Vue: '#41b883',
+        Astro: '#ff5a03',
+        Python: '#3572A5',
+        Java: '#b07219',
+        PHP: '#4F5D95',
+        default: '#8b949e'
+    };
+
+    interface CachedData {
+        timestamp: number;
+        profile: {
+            avatar: string;
+            name: string;
+            bio: string;
+            repos: number;
+            followers: number;
+            url: string;
+        };
+        recentRepos: { name: string; lang: string; stars: number; url: string }[];
+        topLanguages: { name: string; percentage: number; color: string }[];
+    }
+
+    // Check if cache is valid
+    const getCachedData = (): CachedData | null => {
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (!cached) return null;
+            
+            const data: CachedData = JSON.parse(cached);
+            const now = Date.now();
+            
+            if (now - data.timestamp > CACHE_TTL) {
+                localStorage.removeItem(CACHE_KEY);
+                return null;
+            }
+            
+            return data;
+        } catch {
+            return null;
+        }
+    };
+
+    // Save data to cache
+    const setCachedData = (data: Omit<CachedData, 'timestamp'>) => {
+        try {
+            const cacheData: CachedData = {
+                ...data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+        } catch (e) {
+            console.warn('Failed to cache GitHub data:', e);
+        }
+    };
+
+    // Fetch fresh data from GitHub
+    const fetchGitHubData = async (): Promise<Omit<CachedData, 'timestamp'> | null> => {
+        try {
+            // Fetch user profile
+            const userRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`);
+            if (!userRes.ok) throw new Error('User fetch failed');
+            const userData = await userRes.json();
+
+            // Fetch repos
+            const reposRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=pushed&per_page=100`);
+            if (!reposRes.ok) throw new Error('Repos fetch failed');
+            const repos = await reposRes.json();
+
+            const profile = {
+                avatar: userData.avatar_url,
+                name: userData.name || userData.login,
+                bio: userData.bio || 'Frontend Developer',
+                repos: userData.public_repos,
+                followers: userData.followers,
+                url: userData.html_url
+            };
+
+            // Recent repos (top 3)
+            const recentRepos = repos
+                .filter((r: any) => !r.archived && !EXCLUDED_REPOS.includes(r.name) && r.name !== GITHUB_USERNAME)
+                .slice(0, 3)
+                .map((r: any) => ({
+                    name: r.name,
+                    lang: r.language || 'Code',
+                    stars: r.stargazers_count,
+                    url: r.html_url
+                }));
+
+            // Calculate top languages
+            const langCount: Record<string, number> = {};
+            repos.forEach((r: any) => {
+                if (r.language && !r.archived && !r.fork) {
+                    langCount[r.language] = (langCount[r.language] || 0) + 1;
+                }
+            });
+
+            const total = Object.values(langCount).reduce((a, b) => a + b, 0);
+            const topLanguages = total > 0
+                ? Object.entries(langCount)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5)
+                    .map(([name, count]) => ({
+                        name,
+                        percentage: Math.round((count / total) * 100),
+                        color: langColors[name] || langColors.default
+                    }))
+                : [];
+
+            return { profile, recentRepos, topLanguages };
+        } catch (error) {
+            console.warn('GitHub API fetch failed:', error);
+            return null;
+        }
+    };
+
+    // Update DOM with GitHub data
+    const updateDOM = (data: Omit<CachedData, 'timestamp'>) => {
+        const { profile, recentRepos, topLanguages } = data;
+
+        // Update profile
+        const avatarEl = document.getElementById('github-avatar') as HTMLImageElement;
+        const nameEl = document.getElementById('github-name');
+        const bioEl = document.getElementById('github-bio');
+        const reposEl = document.getElementById('github-repos');
+        const followersEl = document.getElementById('github-followers');
+        const profileLink = document.getElementById('github-profile-link') as HTMLAnchorElement;
+
+        if (avatarEl) avatarEl.src = profile.avatar;
+        if (nameEl) nameEl.textContent = profile.name;
+        if (bioEl) bioEl.textContent = profile.bio;
+        if (reposEl) reposEl.textContent = String(profile.repos);
+        if (followersEl) followersEl.textContent = String(profile.followers);
+        if (profileLink) profileLink.href = profile.url;
+
+        // Update recent repos
+        const reposContainer = document.getElementById('github-recent-repos');
+        if (reposContainer && recentRepos.length > 0) {
+            reposContainer.innerHTML = recentRepos.map(repo => `
+                <a href="${repo.url}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-gray-800/50 hover:border-accent/50 hover:bg-gray-800/30 transition-all group/item">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-2 h-2 rounded-full shrink-0" style="background-color: ${langColors[repo.lang] || langColors.default}"></div>
+                        <span class="text-sm text-gray-300 group-hover/item:text-white transition-colors truncate">${repo.name}</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
+                        <span>★</span>
+                        <span>${repo.stars}</span>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // Update languages
+        const langsContainer = document.getElementById('github-languages');
+        if (langsContainer && topLanguages.length > 0) {
+            langsContainer.innerHTML = topLanguages.map(lang => `
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full shrink-0" style="background-color: ${lang.color}"></div>
+                    <span class="text-sm text-gray-300 flex-grow">${lang.name}</span>
+                    <div class="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full" style="width: ${lang.percentage}%; background-color: ${lang.color}"></div>
+                    </div>
+                    <span class="text-[10px] text-gray-500 w-8 text-right">${lang.percentage}%</span>
+                </div>
+            `).join('');
+        }
+    };
+
+    // Main GitHub data loader
+    const loadGitHubData = async () => {
+        // Try to load from cache first
+        const cached = getCachedData();
+        if (cached) {
+            console.log('📦 Using cached GitHub data');
+            updateDOM(cached);
+            return;
+        }
+
+        // Fetch fresh data
+        console.log('🔄 Fetching fresh GitHub data...');
+        const freshData = await fetchGitHubData();
+        if (freshData) {
+            setCachedData(freshData);
+            updateDOM(freshData);
+            console.log('✅ GitHub data cached for 1 hour');
+        }
+    };
+
+    const initAnimations = () => {
+        const bentoItems = document.querySelectorAll('#dashboard .bento-item');
+        const dashboard = document.getElementById('dashboard');
+
+        if (bentoItems.length > 0 && dashboard) {
+            // Simple entrance animation - cards start slightly below and fade in
+            bentoItems.forEach((item, index) => {
+                gsap.fromTo(item, 
+                    { 
+                        opacity: 0, 
+                        y: 30 
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.6,
+                        delay: index * 0.1,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: item,
+                            start: 'top 85%',
+                            end: 'bottom 15%',
+                            toggleActions: 'play none none reverse'
+                        }
+                    }
+                );
+            });
+        }
+    };
+
+    const init = () => {
+        loadGitHubData();
+        initAnimations();
+    };
+
+    // Run on page load
+    document.addEventListener('astro:page-load', init);
+    document.addEventListener('DOMContentLoaded', init);
+    
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(init, 100);
+    }
+</script>

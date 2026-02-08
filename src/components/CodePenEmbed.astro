@@ -1,0 +1,78 @@
+---
+---
+
+<section id="codepen" class="px-4 py-20 md:px-10 border-t border-gray-900">
+    <div class="mb-10 flex items-end justify-between codepen-anim">
+        <h2 class="text-3xl font-bold text-white md:text-4xl"><span class="text-accent">05.</span> Creative Coding</h2>
+        <a href="https://codepen.io/altaskur" target="_blank" class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">VIEW_ALL_PENS ///</a>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+        <div class="codepen-card rounded-xl border border-gray-800 bg-[#1e1e1e] p-1 hover:border-accent/50 transition-colors">
+            <p class="codepen" data-height="400" data-theme-id="dark" data-default-tab="result" data-slug-hash="ExwKoNa" data-user="altaskur" style="height: 400px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+              <span>See the Pen <a href="https://codepen.io/altaskur/pen/ExwKoNa">CSS Grid Layout</a> by Altaskur (<a href="https://codepen.io/altaskur">@altaskur</a>) on <a href="https://codepen.io">CodePen</a>.</span>
+            </p>
+        </div>
+        <div class="codepen-card rounded-xl border border-gray-800 bg-[#1e1e1e] p-1 hover:border-accent/50 transition-colors">
+             <p class="codepen" data-height="400" data-theme-id="dark" data-default-tab="result" data-slug-hash="mdWbXqO" data-user="altaskur" style="height: 400px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+              <span>See the Pen <a href="https://codepen.io/altaskur/pen/mdWbXqO">CSS Animation</a> by Altaskur (<a href="https://codepen.io/altaskur">@altaskur</a>) on <a href="https://codepen.io">CodePen</a>.</span>
+            </p>
+        </div>
+    </div>
+    
+    <script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"></script>
+</section>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const initCodepenAnimations = () => {
+        const header = document.querySelector('#codepen .codepen-anim');
+        const cards = document.querySelectorAll('.codepen-card');
+
+        // Header animation
+        if (header) {
+            gsap.set(header, { opacity: 0, y: 30 });
+            gsap.to(header, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '#codepen',
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        }
+
+        // Cards animation with stagger
+        if (cards.length > 0) {
+            gsap.set(cards, { opacity: 0, y: 40, scale: 0.95 });
+            
+            gsap.to(cards, {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.7,
+                stagger: 0.15,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '#codepen',
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        }
+    };
+
+    document.addEventListener('astro:page-load', initCodepenAnimations);
+    document.addEventListener('DOMContentLoaded', initCodepenAnimations);
+    
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initCodepenAnimations, 200);
+    }
+</script>

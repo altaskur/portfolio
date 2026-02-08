@@ -1,0 +1,188 @@
+---
+import { XMLParser } from "fast-xml-parser";
+
+const parser = new XMLParser({ ignoreAttributes: false });
+
+interface YTEntry {
+    title: string;
+    link: string;
+    videoId: string;
+    author: {
+        name: string;
+        uri: string;
+    };
+    published: string;
+    thumbnail: {
+        url: string;
+        width: string;
+        height: string;
+    };
+}
+
+const PLAYLIST_ID = "PLlgeLnJGwhJHCo99dHeQsQoIWi4Elj_W8";
+const YouTubePath = `https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`;
+
+let entries: YTEntry[] = [];
+
+try {
+    const response = await fetch(YouTubePath);
+    const xmlText = await response.text();
+    const parsedData = parser.parse(xmlText);
+
+    if (parsedData.feed?.entry) {
+        const entryArray = Array.isArray(parsedData.feed.entry) 
+            ? parsedData.feed.entry 
+            : [parsedData.feed.entry];
+
+        entries = entryArray.map((entry: any) => ({
+            title: entry.title,
+            link: entry.link?.["@_href"] || entry.link?.href || "#",
+            videoId: entry["yt:videoId"],
+            author: {
+                name: entry.author?.name || "Altaskur",
+                uri: entry.author?.uri || `https://www.youtube.com/@altaskur`,
+            },
+            published: entry.published,
+            thumbnail: {
+                url: entry["media:group"]?.["media:thumbnail"]?.["@_url"] || 
+                     `https://img.youtube.com/vi/${entry["yt:videoId"]}/hqdefault.jpg`,
+                width: entry["media:group"]?.["media:thumbnail"]?.["@_width"] || "480",
+                height: entry["media:group"]?.["media:thumbnail"]?.["@_height"] || "360",
+            },
+        }));
+    }
+} catch (error) {
+    console.error("Error fetching YouTube RSS:", error);
+}
+
+// Fallback if no videos fetched
+if (entries.length === 0) {
+    entries = [
+        {
+            title: "Video de ejemplo",
+            link: `https://www.youtube.com/playlist?list=${PLAYLIST_ID}`,
+            videoId: "placeholder",
+            author: { name: "Altaskur", uri: "https://www.youtube.com/@altaskur" },
+            published: new Date().toISOString(),
+            thumbnail: { url: "", width: "480", height: "360" }
+        }
+    ];
+}
+---
+
+<section id="media" class="py-20 border-t border-gray-900 overflow-hidden">
+    <div class="px-4 md:px-10 mb-10 flex items-end justify-between">
+        <h2 class="text-3xl font-bold text-white md:text-4xl"><span class="text-accent">04.</span> Media & Talks</h2>
+        <a href={`https://www.youtube.com/playlist?list=${PLAYLIST_ID}`} target="_blank" class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">VIEW PLAYLIST ///</a>
+    </div>
+    
+    <!-- Horizontal Scroll Carousel -->
+    <div id="media-carousel" class="relative">
+        <div class="flex gap-6 px-4 md:px-10 pb-6 overflow-x-auto scrollbar-hide" id="carousel-track">
+            {entries.map((entry, i) => (
+                <a 
+                    href={entry.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="media-card flex-shrink-0 w-[320px] md:w-[420px] group relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 hover:border-accent/50 transition-all"
+                >
+                    <div class="aspect-video w-full bg-black relative overflow-hidden">
+                        {entry.thumbnail.url ? (
+                            <img 
+                                src={entry.thumbnail.url}
+                                alt={entry.title}
+                                width={entry.thumbnail.width}
+                                height={entry.thumbnail.height}
+                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                                loading="lazy"
+                            />
+                        ) : (
+                            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                                <span class="font-mono text-lg text-gray-600">./video_{i + 1}</span>
+                            </div>
+                        )}
+                        <!-- Play button overlay -->
+                        <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <div class="w-16 h-16 rounded-full bg-accent/90 flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            </div>
+                        </div>
+                        <!-- Position badge -->
+                        <span class="absolute top-3 left-3 text-[10px] font-mono bg-black/70 text-white px-2 py-1 rounded font-bold">#{i + 1}</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-white group-hover:text-accent transition-colors mb-2 line-clamp-2">{entry.title}</h3>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span class="font-mono">{entry.author.name}</span>
+                            <span>{new Date(entry.published).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </div>
+    
+    <!-- Scroll hint and progress -->
+    <div class="px-4 md:px-10 mt-4 flex items-center gap-4">
+        <div class="h-1 flex-grow bg-gray-800 rounded-full overflow-hidden">
+            <div id="carousel-progress" class="h-full bg-accent w-0 transition-all duration-300 ease-out rounded-full"></div>
+        </div>
+        <span class="text-xs font-mono text-gray-600">← SCROLL →</span>
+    </div>
+</section>
+
+<style>
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+</style>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const initMediaCarousel = () => {
+        const track = document.getElementById('carousel-track');
+        const progress = document.getElementById('carousel-progress');
+        const cards = document.querySelectorAll('.media-card');
+
+        if (!track || cards.length === 0) return;
+
+        // Card entrance animation
+        gsap.set(cards, { opacity: 0, y: 30 });
+        
+        gsap.to(cards, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '#media',
+                start: 'top 80%',
+                toggleActions: 'play none none none'
+            }
+        });
+
+        // Update progress bar on horizontal scroll
+        if (track && progress) {
+            track.addEventListener('scroll', () => {
+                const scrollPercent = (track.scrollLeft / (track.scrollWidth - track.clientWidth)) * 100;
+                progress.style.width = `${Math.min(scrollPercent, 100)}%`;
+            });
+        }
+    };
+
+    document.addEventListener('astro:page-load', initMediaCarousel);
+    document.addEventListener('DOMContentLoaded', initMediaCarousel);
+    
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(initMediaCarousel, 200);
+    }
+</script>

@@ -1,0 +1,148 @@
+---
+const socials = [
+    {
+        name: "GitHub",
+        url: "https://github.com/altaskur",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>`,
+        username: "@altaskur",
+        description: "Code, projects and contributions",
+        color: "#ffffff"
+    },
+    {
+        name: "LinkedIn",
+        url: "https://www.linkedin.com/in/isaac-juli%C3%A1n/",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>`,
+        username: "isaac-julián",
+        description: "Networking and professional experience",
+        color: "#0077b5"
+    },
+    {
+        name: "Twitch",
+        url: "https://www.twitch.tv/altaskur",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M2.149 0l-1.612 4.119v16.836h5.731v3.045h3.224l3.045-3.045h4.657l6.269-6.269v-14.686h-21.314zm19.164 13.612l-3.582 3.582h-5.731l-3.045 3.045v-3.045h-4.836v-15.045h17.194v11.463zm-3.582-7.343v6.262h-2.149v-6.262h2.149zm-5.731 0v6.262h-2.149v-6.262h2.149z" fill-rule="evenodd" clip-rule="evenodd"/></svg>`,
+        username: "@altaskur",
+        description: "Live coding streams",
+        color: "#9147ff"
+    },
+    {
+        name: "Dev.to",
+        url: "https://dev.to/altaskur",
+        icon: `<img src="/assets/devto-icon.png" alt="Dev.to" width="32" height="32" style="filter: grayscale(1) brightness(2);" />`,
+        username: "@altaskur",
+        description: "Technical articles and tutorials",
+        color: "#ffffff"
+    },
+    {
+        name: "BlueSky",
+        url: "https://bsky.app/profile/altaskur.live",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm3.5 14.5c-2.5 0-3.5-2.5-3.5-2.5s-1 2.5-3.5 2.5c-2 0-3-1.5-3-3s1.5-3 3-3c1 0 2 .5 2.5 1 .5.5 1 1.5 1 1.5s.5-1 1-1.5c.5-.5 1.5-1 2.5-1 1.5 0 3 1.5 3 3s-1 3-3 3z"/></svg>`,
+        username: "@altaskur.live",
+        description: "Thoughts and dev community",
+        color: "#1185fe"
+    },
+    {
+        name: "YouTube",
+        url: "https://www.youtube.com/@altaskur",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>`,
+        username: "@altaskur",
+        description: "Talks, workshops and tutorials",
+        color: "#ff0000"
+    }
+];
+---
+
+<section id="social" class="relative py-20 overflow-hidden">
+    <!-- Interactive Background -->
+    <!-- Background removed to show global background -->
+
+    <div class="relative z-10 px-4 md:px-10">
+        <div class="mb-16 text-center social-header">
+            <h2 class="text-3xl font-bold text-white md:text-5xl mb-4"><span class="text-accent">05.</span> Social</h2>
+            <p class="text-gray-400 font-mono text-sm">// FIND ME ON THE WEB</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
+            {socials.map((social, index) => (
+                <a 
+                    href={social.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    aria-label={`Visit ${social.name}: ${social.username}`}
+                    class="social-card group relative p-6 rounded-2xl border border-gray-800/50 bg-gray-900/30 backdrop-blur-sm hover:border-accent/50 transition-all duration-300 hover:scale-105 hover:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-accent"
+                    style={`--card-color: ${social.color}; animation-delay: ${index * 0.1}s`}
+                >
+                    <div class="flex flex-col items-center text-center gap-3">
+                        <div class="text-gray-400 group-hover:text-[var(--card-color)] transition-colors duration-300" set:html={social.icon}></div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white group-hover:text-accent transition-colors">{social.name}</h3>
+                            <p class="text-xs font-mono text-gray-400 mt-1">{social.username}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Hover glow effect -->
+                    <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={`box-shadow: 0 0 40px ${social.color}20, inset 0 0 20px ${social.color}10`}></div>
+                </a>
+            ))}
+        </div>
+    </div>
+</section>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Interactive Background Animation
+    // Card animations
+    const initSocialAnimations = () => {
+        const header = document.querySelector('.social-header');
+        const cards = document.querySelectorAll('.social-card');
+
+        if (header) {
+            gsap.set(header, { opacity: 0, y: 30 });
+            gsap.to(header, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '#social',
+                    start: 'top 80%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        }
+
+        if (cards.length > 0) {
+            gsap.set(cards, { opacity: 0, y: 40, scale: 0.9 });
+            gsap.to(cards, {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.5,
+                stagger: 0.08,
+                ease: 'back.out(1.7)',
+                scrollTrigger: {
+                    trigger: '#social',
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        }
+    };
+
+    document.addEventListener('astro:page-load', () => {
+        initSocialAnimations();
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        initSocialAnimations();
+    });
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(() => {
+            initSocialAnimations();
+        }, 200);
+    }
+</script>

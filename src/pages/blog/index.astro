@@ -1,0 +1,55 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('lab');
+// Sort by date desc
+const sortedPosts = posts.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+// Unique tags for filter
+const tags = [...new Set(posts.flatMap(post => post.data.type === 'article' || post.data.type === 'experiment' ? [post.data.type] : []))];
+---
+
+<Layout title="Blog | Altaskur">
+    <main class="min-h-screen px-4 py-20 md:px-10 max-w-5xl mx-auto">
+        <header class="mb-16">
+            <h1 class="text-4xl font-bold text-white md:text-6xl mb-4">
+                <span class="text-accent">></span> The Lab
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl">
+                Experiments, thoughts, and technical notes on frontend architecture, performance, and "Dark Systems".
+            </p>
+        </header>
+
+        <!-- Category Filter (Visual only for now, could be made functional with client JS) -->
+        <div class="flex gap-4 mb-10 overflow-x-auto pb-2">
+            <a href="/blog" class="px-4 py-2 rounded-full bg-accent text-black font-bold text-sm">All</a>
+            {tags.map(tag => (
+                <span class="px-4 py-2 rounded-full bg-gray-900 border border-gray-800 text-gray-400 text-sm capitalize hover:border-accent hover:text-white transition-colors cursor-pointer">
+                    {tag}
+                </span>
+            ))}
+        </div>
+
+        <div class="grid gap-8">
+            {sortedPosts.map(post => (
+                <article class="group relative flex flex-col md:flex-row gap-6 p-6 rounded-xl border border-gray-900 bg-gray-900/20 hover:border-gray-700 transition-colors">
+                    <div class="md:w-1/4 flex flex-col text-sm text-gray-500 font-mono">
+                        <span>{post.data.publishDate.toLocaleDateString()}</span>
+                        <span class="text-accent mt-2 uppercase tracking-wider">{post.data.type}</span>
+                    </div>
+                    
+                    <div class="md:w-3/4 space-y-3">
+                        <h2 class="text-2xl font-bold text-white group-hover:text-accent transition-colors">
+                            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+                        </h2>
+                        <p class="text-gray-400">{post.data.description}</p>
+                        <a href={`/blog/${post.slug}`} class="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-accent mt-2">
+                            READ_ENTRY <span class="group-hover:translate-x-1 transition-transform">-></span>
+                        </a>
+                    </div>
+                </article>
+            ))}
+        </div>
+    </main>
+</Layout>

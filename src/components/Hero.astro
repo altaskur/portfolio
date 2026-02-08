@@ -1,0 +1,176 @@
+---
+---
+
+<section id="hero" class="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 py-20 md:px-10">
+	<div class="z-10 w-full max-w-4xl">
+		
+		<h1 class="mt-6 text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-tight">
+            <span class="hero-text-anim inline-block">Building</span>
+            <span class="hero-text-anim inline-block text-accent">interfaces</span>
+            <br class="hidden md:block" />
+            <span class="hero-text-anim inline-block">that</span>
+            <span class="hero-text-anim inline-block">hold</span>
+            <span class="hero-text-anim inline-block">up</span>
+            <span class="hero-text-anim inline-block">over</span>
+            <span class="hero-text-anim inline-block">time.</span>
+		</h1>
+
+        <p class="mt-6 text-xl text-gray-300 font-light leading-relaxed hero-text-anim-secondary">
+            Thoughtful frontend development focused on context, people, and evolution — not just code.
+        </p>
+
+		<div class="mt-8 space-y-4 max-w-xl text-lg text-gray-400 leading-relaxed hero-text-anim-secondary border-l-2 border-accent/30 pl-6">
+            <p>
+                I care about how things are built, why they’re built, and what happens to them six months later.
+            </p>
+            <p>
+                Accessibility, collaboration, and maintainability are not extras — they’re the baseline.
+            </p>
+            <span class="block mt-6 text-sm font-mono text-gray-500">
+                <span class="text-accent">></span> LOC: Alicante, ES
+            </span>
+
+            <!-- Hero CTA -->
+            <div class="pt-6">
+                <button id="hero-ai-trigger" class="group relative inline-flex items-center gap-2 overflow-hidden rounded-lg bg-gray-800/50 px-6 py-3 text-sm font-mono text-gray-300 ring-1 ring-gray-700 transition-all hover:bg-gray-800 hover:ring-accent hover:text-white focus:outline-none focus:ring-2 focus:ring-accent">
+                    <span class="relative z-10 flex items-center gap-2">
+                        <span class="h-2 w-2 animate-pulse rounded-full bg-accent"></span>
+                        Talk to AI
+                    </span>
+                    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-accent/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
+                </button>
+            </div>
+		</div>
+        
+        <!-- Centered Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-center hero-text-anim-secondary">
+            <span class="block text-xs font-mono text-gray-500 animate-pulse">
+                ↓ Scroll to explore
+            </span>
+        </div>
+
+	</div>
+    
+	</div>
+    
+	</div>
+
+<style>
+    @keyframes scroll-down {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100%); }
+    }
+    .animate-scroll-down {
+        animation: scroll-down 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+    }
+</style>
+
+    <!-- Playground Panel (Hidden by default) -->
+    <div id="playground-panel" class="fixed right-4 top-20 z-50 hidden w-64 rounded-xl border border-gray-800 bg-gray-900/90 p-4 shadow-2xl backdrop-blur-md">
+        <h3 class="mb-4 text-xs font-mono font-bold uppercase tracking-wider text-gray-500">System Controls</h3>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="mb-2 block text-xs text-gray-400">Accent Color</label>
+                <div class="flex gap-2">
+                    <button class="h-6 w-6 rounded-full bg-blue-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#3B82F6"></button>
+                    <button class="h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#10B981"></button>
+                    <button class="h-6 w-6 rounded-full bg-purple-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#8B5CF6"></button>
+                    <button class="h-6 w-6 rounded-full bg-orange-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#F97316"></button>
+                </div>
+            </div>
+
+             <div>
+                <label class="mb-2 block text-xs text-gray-400">Grid Intensity</label>
+                <input type="range" min="0" max="0.5" step="0.05" value="0.2" class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-accent" id="grid-intensity">
+            </div>
+        </div>
+    </div>
+    <!-- Floating Action Button -->
+    <button id="fab-ai-trigger" class="fixed bottom-6 right-6 z-[90] flex h-14 w-14 items-center justify-center rounded-full bg-accent text-black shadow-lg shadow-accent/20 transition-all hover:scale-110 hover:shadow-accent/40 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 group" aria-label="Open AI Terminal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:rotate-12">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span class="absolute -top-1 -right-1 h-3 w-3 animate-ping rounded-full bg-white opacity-75"></span>
+        <span class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-white"></span>
+    </button>
+</section>
+
+<script>
+	import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+    
+    gsap.registerPlugin(ScrollTrigger);
+    
+	const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+    // Staggered reveal for bio and other elements (text is now visible by default)
+	tl.to(".hero-anim", {
+		y: 0,
+		opacity: 1,
+		duration: 1,
+		stagger: 0.1,
+        delay: 0.2
+	});
+    
+    // Scroll-triggered fade out for headline words AND bio
+    const textElements = document.querySelectorAll(".hero-text-anim");
+    const secondaryText = document.querySelectorAll(".hero-text-anim-secondary");
+    
+    const scrollTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: "section", 
+            start: "top top",   
+            end: "bottom center", 
+            scrub: 1,           
+        }
+    });
+
+    scrollTl.to(textElements, {
+        opacity: 0,
+        y: -30,           
+        filter: "blur(10px)",
+        stagger: 0.1,     
+        ease: "power1.in"
+    });
+    
+    scrollTl.to(secondaryText, {
+        opacity: 0,
+        y: -30,
+        filter: "blur(5px)",
+        duration: 0.5,
+        ease: "power1.in"
+    }, "<0.5");
+    
+    // Removed float animation per user request
+
+    // Keyboard shortcut for (hidden) playground
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+             console.log("System Ready.");
+        }
+    });
+
+    // AI Triggers
+    const triggerAI = () => {
+        if (typeof (window as any).openAITerminal === 'function') {
+            (window as any).openAITerminal();
+        }
+    };
+
+    const heroTrigger = document.getElementById('hero-ai-trigger');
+    const fabTrigger = document.getElementById('fab-ai-trigger');
+
+    heroTrigger?.addEventListener('click', triggerAI);
+    fabTrigger?.addEventListener('click', triggerAI);
+
+    // Initial animation for FAB
+    gsap.from("#fab-ai-trigger", {
+        scale: 0,
+        opacity: 0,
+        duration: 0.5,
+        delay: 2,
+        ease: "back.out(1.7)"
+    });
+</script>
