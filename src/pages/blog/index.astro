@@ -23,7 +23,7 @@ const tags = [...new Set(posts.flatMap(post => post.data.type === 'article' || p
 
         <!-- Category Filter (Visual only for now, could be made functional with client JS) -->
         <div class="flex gap-4 mb-10 overflow-x-auto pb-2">
-            <a href="/blog" class="px-4 py-2 rounded-full bg-accent text-black font-bold text-sm">All</a>
+            <a href="blog" class="px-4 py-2 rounded-full bg-accent text-black font-bold text-sm">All</a>
             {tags.map(tag => (
                 <span class="px-4 py-2 rounded-full bg-gray-900 border border-gray-800 text-gray-400 text-sm capitalize hover:border-accent hover:text-white transition-colors cursor-pointer">
                     {tag}
