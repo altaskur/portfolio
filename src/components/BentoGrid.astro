@@ -1,372 +1,576 @@
 ---
-import BentoItem from './BentoItem.astro';
+import BentoItem from "./BentoItem.astro";
 
 const GITHUB_USERNAME = "altaskur";
-const EXCLUDED_REPOS = ['Apuntes', 'Express.js-Talleres-Donweb', 'altaskur'];
+const EXCLUDED_REPOS = ["Apuntes", "Express.js-Talleres-Donweb", "altaskur"];
 
 const langColors: Record<string, string> = {
-    TypeScript: '#3178c6',
-    JavaScript: '#f1e05a',
-    HTML: '#e34c26',
-    CSS: '#563d7c',
-    Vue: '#41b883',
-    Astro: '#ff5a03',
-    Python: '#3572A5',
-    Java: '#b07219',
-    PHP: '#4F5D95',
-    default: '#8b949e'
+  TypeScript: "#3178c6",
+  JavaScript: "#f1e05a",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  Vue: "#41b883",
+  Astro: "#ff5a03",
+  Python: "#3572A5",
+  Java: "#b07219",
+  PHP: "#4F5D95",
+  default: "#8b949e",
 };
 
 // Fallback data (used if GitHub API is unavailable at build time)
 let profile = {
-    avatar: `/assets/avatar.webp`,
-    name: "Isaac",
-    bio: "Software Developer",
-    repos: 90,
-    followers: 150,
-    years: (new Date().getFullYear() - 2020),
-    url: `https://github.com/${GITHUB_USERNAME}`
+  avatar: `/assets/avatar.webp`,
+  name: "Isaac",
+  bio: "Software Developer",
+  repos: 90,
+  followers: 150,
+  years: new Date().getFullYear() - 2020,
+  url: `https://github.com/${GITHUB_USERNAME}`,
 };
 
 let recentRepos = [
-    { name: "OpenTimeTracker", lang: "TypeScript", stars: 2, url: `https://github.com/${GITHUB_USERNAME}/OpenTimeTracker` },
-    { name: "Portfolio", lang: "Astro", stars: 1, url: `https://github.com/${GITHUB_USERNAME}/Portfolio` },
-    { name: "Lateteriaelda", lang: "Vue", stars: 0, url: `https://github.com/${GITHUB_USERNAME}/Lateteriaelda` }
+  {
+    name: "OpenTimeTracker",
+    lang: "TypeScript",
+    stars: 2,
+    url: `https://github.com/${GITHUB_USERNAME}/OpenTimeTracker`,
+  },
+  {
+    name: "Portfolio",
+    lang: "Astro",
+    stars: 1,
+    url: `https://github.com/${GITHUB_USERNAME}/Portfolio`,
+  },
+  {
+    name: "Lateteriaelda",
+    lang: "Vue",
+    stars: 0,
+    url: `https://github.com/${GITHUB_USERNAME}/Lateteriaelda`,
+  },
 ];
 
 let topLanguages = [
-    { name: "TypeScript", percentage: 35, color: langColors.TypeScript },
-    { name: "JavaScript", percentage: 25, color: langColors.JavaScript },
-    { name: "Vue", percentage: 20, color: langColors.Vue },
-    { name: "HTML", percentage: 12, color: langColors.HTML },
-    { name: "CSS", percentage: 8, color: langColors.CSS }
+  { name: "TypeScript", percentage: 35, color: langColors.TypeScript },
+  { name: "JavaScript", percentage: 25, color: langColors.JavaScript },
+  { name: "Vue", percentage: 20, color: langColors.Vue },
+  { name: "HTML", percentage: 12, color: langColors.HTML },
+  { name: "CSS", percentage: 8, color: langColors.CSS },
 ];
 
 // Fetch GitHub data at build time — zero runtime cost
 try {
-    const [userRes, reposRes] = await Promise.all([
-        fetch(`https://api.github.com/users/${GITHUB_USERNAME}`),
-        fetch(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=pushed&per_page=20`)
-    ]);
+  const [userRes, reposRes] = await Promise.all([
+    fetch(`https://api.github.com/users/${GITHUB_USERNAME}`),
+    fetch(
+      `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=pushed&per_page=20`,
+    ),
+  ]);
 
-    if (userRes.ok && reposRes.ok) {
-        const userData = await userRes.json();
-        const repos = await reposRes.json();
+  if (userRes.ok && reposRes.ok) {
+    const userData = await userRes.json();
+    const repos = await reposRes.json();
 
-        profile = {
-            avatar: `/assets/avatar.webp`,
-            name: userData.name || userData.login,
-            bio: userData.bio || 'Software Developer',
-            repos: userData.public_repos,
-            followers: userData.followers,
-            years: (new Date().getFullYear() - 2020),
-            url: userData.html_url
-        };
+    profile = {
+      avatar: `/assets/avatar.webp`,
+      name: userData.name || userData.login,
+      bio: userData.bio || "Software Developer",
+      repos: userData.public_repos,
+      followers: userData.followers,
+      years: new Date().getFullYear() - 2020,
+      url: userData.html_url,
+    };
 
-        recentRepos = repos
-            .filter((r: any) => !r.archived && !EXCLUDED_REPOS.includes(r.name) && r.name !== GITHUB_USERNAME)
-            .slice(0, 3)
-            .map((r: any) => ({
-                name: r.name,
-                lang: r.language || 'Code',
-                stars: r.stargazers_count,
-                url: r.html_url
-            }));
+    recentRepos = repos
+      .filter(
+        (r: any) =>
+          !r.archived &&
+          !EXCLUDED_REPOS.includes(r.name) &&
+          r.name !== GITHUB_USERNAME,
+      )
+      .slice(0, 3)
+      .map((r: any) => ({
+        name: r.name,
+        lang: r.language || "Code",
+        stars: r.stargazers_count,
+        url: r.html_url,
+      }));
 
-        const langCount: Record<string, number> = {};
-        repos.forEach((r: any) => {
-            if (r.language && !r.archived && !r.fork) {
-                langCount[r.language] = (langCount[r.language] || 0) + 1;
-            }
-        });
+    const langCount: Record<string, number> = {};
+    repos.forEach((r: any) => {
+      if (r.language && !r.archived && !r.fork) {
+        langCount[r.language] = (langCount[r.language] || 0) + 1;
+      }
+    });
 
-        const total = Object.values(langCount).reduce((a: number, b: number) => a + b, 0);
-        if (total > 0) {
-            topLanguages = Object.entries(langCount)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([name, count]) => ({
-                    name,
-                    percentage: Math.round((count / total) * 100),
-                    color: langColors[name] || langColors.default
-                }));
-        }
+    const total = Object.values(langCount).reduce(
+      (a: number, b: number) => a + b,
+      0,
+    );
+    if (total > 0) {
+      topLanguages = Object.entries(langCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({
+          name,
+          percentage: Math.round((count / total) * 100),
+          color: langColors[name] || langColors.default,
+        }));
     }
+  }
 } catch (e) {
-    console.warn('[BentoGrid] GitHub API unavailable at build time, using fallback data');
+  console.warn(
+    "[BentoGrid] GitHub API unavailable at build time, using fallback data",
+  );
 }
 ---
 
 <section id="dashboard" class="px-4 py-20 md:px-10">
-    <h2 class="dashboard-header mb-10 text-3xl font-bold text-white md:text-4xl opacity-0 translate-y-8">
-        <span class="text-accent">04.</span> GitHub
-    </h2>
+  <h2
+    class="dashboard-header mb-10 text-3xl font-bold text-white md:text-4xl opacity-0 translate-y-8"
+  >
+    <span class="text-accent">04.</span> GitHub
+  </h2>
 
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6">
+    <!-- ROW 1: Profile (1) + Recent Activity (1) + Languages (1) -->
 
-        <!-- ROW 1: Profile (1) + Recent Activity (1) + Languages (1) -->
-        
-        <!-- Profile Card -->
-        <BentoItem class="md:col-span-1 group" title="">
-            <a id="github-profile-link" href={profile.url} target="_blank" rel="noopener noreferrer" class="flex flex-col h-full">
-                <div class="flex items-center gap-4 mb-4">
-                    <img 
-                        id="github-avatar"
-                        src={profile.avatar}
-                        alt={profile.name}
-                        width="64"
-                        height="64"
-                        class="w-16 h-16 rounded-full border-2 border-gray-700 group-hover:border-accent transition-colors"
-                    />
-                    <div>
-                        <h3 id="github-name" class="text-lg font-bold text-white group-hover:text-accent transition-colors">{profile.name}</h3>
-                        <p class="text-xs text-gray-500 font-mono">@{GITHUB_USERNAME}</p>
-                    </div>
-                </div>
-                <p id="github-bio" class="text-sm text-gray-400 mb-4 flex-grow">{profile.bio}</p>
-                <div class="grid grid-cols-3 gap-2 text-center border-t border-gray-800 pt-4">
-                    <div>
-                        <span id="github-repos" class="block text-lg font-bold text-white">{profile.repos}</span>
-                        <span class="text-[10px] text-gray-500 uppercase">Repos</span>
-                    </div>
-                    <div>
-                        <span id="github-followers" class="block text-lg font-bold text-white">{profile.followers}</span>
-                        <span class="text-[10px] text-gray-500 uppercase">Followers</span>
-                    </div>
-                    <div>
-                        <span class="block text-lg font-bold text-white">{profile.years}+</span>
-                        <span class="text-[10px] text-gray-500 uppercase">Years</span>
-                    </div>
-                </div>
-            </a>
-        </BentoItem>
-
-        <!-- Actividad reciente -->
-        <BentoItem class="md:col-span-1" title="Actividad reciente">
-            <div id="github-recent-repos" class="space-y-3 h-full">
-                {recentRepos.map(repo => (
-                    <a href={repo.url} target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-gray-800/50 hover:border-accent/50 hover:bg-gray-800/30 transition-all group/item">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-2 h-2 rounded-full shrink-0" style={`background-color: ${langColors[repo.lang] || langColors.default}`}></div>
-                            <span class="text-sm text-gray-300 group-hover/item:text-white transition-colors truncate">{repo.name}</span>
-                        </div>
-                        <div class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
-                            <span>★</span>
-                            <span>{repo.stars}</span>
-                        </div>
-                    </a>
-                ))}
-            </div>
-        </BentoItem>
-
-        <!-- Lenguajes -->
-        <BentoItem class="md:col-span-1" title="Lenguajes">
-            <div id="github-languages" class="space-y-3 h-full">
-                {topLanguages.map(lang => (
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-full shrink-0" style={`background-color: ${lang.color}`}></div>
-                        <span class="text-sm text-gray-300 flex-grow">{lang.name}</span>
-                        <div class="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full" style={`width: ${lang.percentage}%; background-color: ${lang.color}`}></div>
-                        </div>
-                        <span class="text-[10px] text-gray-500 w-8 text-right">{lang.percentage}%</span>
-                    </div>
-                ))}
-            </div>
-        </BentoItem>
-
-        <!-- ROW 2: Contribuciones (Full Width) -->
-        <BentoItem class="md:col-span-3 group cursor-pointer hover:border-accent/50 transition-colors" title="">
-            <a href={profile.url} target="_blank" rel="noopener noreferrer" class="flex flex-col h-full relative">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <span class="bg-accent text-black px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">GIT</span>
-                        <span class="text-sm font-bold text-white">Contribuciones</span>
-                    </div>
-                    <span class="text-[10px] text-gray-500 font-mono group-hover:text-gray-300 transition-colors">
-                        Ver historial completo →
-                    </span>
-                </div>
-
-                <div class="flex justify-between items-end w-full flex-grow gap-[2px] opacity-50 group-hover:opacity-100 transition-opacity">
-                    {Array.from({ length: 52 }).map((_, weekIndex) => (
-                        <div class="flex flex-col gap-[2px] flex-1">
-                            {Array.from({ length: 7 }).map((_, dayIndex) => {
-                                const rand = Math.random();
-                                const opacity = rand > 0.7 ? (rand * 0.7 + 0.3) : 0;
-                                return (
-                                    <div 
-                                        class={`w-full aspect-square rounded-[2px] ${opacity > 0 ? 'bg-accent' : 'bg-gray-800/30'}`}
-                                        style={opacity > 0 ? `opacity: ${opacity.toFixed(2)}` : ''}
-                                    ></div>
-                                );
-                            })}
-                        </div>
-                    ))}
-                </div>
-            </a>
-        </BentoItem>
-
-    </div>
-
-    <!-- Proyectos destacados -->
-    <div class="mt-20 border-t border-gray-800 pt-16">
-        <div class="mb-10 flex items-end justify-between projects-header opacity-0 translate-y-10">
-            <h3 class="text-2xl font-bold text-white md:text-3xl">
-                <span class="text-accent">///</span> Proyectos destacados
+    <!-- Profile Card -->
+    <BentoItem class="md:col-span-1 group" title="">
+      <a
+        id="github-profile-link"
+        href={profile.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex flex-col h-full"
+      >
+        <div class="flex items-center gap-4 mb-4">
+          <img
+            id="github-avatar"
+            src={profile.avatar}
+            alt={profile.name}
+            width="64"
+            height="64"
+            class="w-16 h-16 rounded-full border-2 border-gray-700 group-hover:border-accent transition-colors"
+          />
+          <div>
+            <h3
+              id="github-name"
+              class="text-lg font-bold text-white group-hover:text-accent transition-colors"
+            >
+              {profile.name}
             </h3>
-            <a href="https://github.com/altaskur" target="_blank" rel="noopener noreferrer"
-               class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">
-                github.com/altaskur ↗
+            <p class="text-xs text-gray-500 font-mono">@{GITHUB_USERNAME}</p>
+          </div>
+        </div>
+        <p id="github-bio" class="text-sm text-gray-400 mb-4 flex-grow">
+          {profile.bio}
+        </p>
+        <div
+          class="grid grid-cols-3 gap-2 text-center border-t border-gray-800 pt-4"
+        >
+          <div>
+            <span id="github-repos" class="block text-lg font-bold text-white"
+              >{profile.repos}</span
+            >
+            <span class="text-[10px] text-gray-500 uppercase">Repos</span>
+          </div>
+          <div>
+            <span
+              id="github-followers"
+              class="block text-lg font-bold text-white"
+              >{profile.followers}</span
+            >
+            <span class="text-[10px] text-gray-500 uppercase">Followers</span>
+          </div>
+          <div>
+            <span class="block text-lg font-bold text-white"
+              >{profile.years}+</span
+            >
+            <span class="text-[10px] text-gray-500 uppercase">Years</span>
+          </div>
+        </div>
+      </a>
+    </BentoItem>
+
+    <!-- Actividad reciente -->
+    <BentoItem class="md:col-span-1" title="Actividad reciente">
+      <div id="github-recent-repos" class="space-y-3 h-full">
+        {
+          recentRepos.map((repo) => (
+            <a
+              href={repo.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-gray-800/50 hover:border-accent/50 hover:bg-gray-800/30 transition-all group/item"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <div
+                  class="w-2 h-2 rounded-full shrink-0"
+                  style={`background-color: ${langColors[repo.lang] || langColors.default}`}
+                />
+                <span class="text-sm text-gray-300 group-hover/item:text-white transition-colors truncate">
+                  {repo.name}
+                </span>
+              </div>
+              <div class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0">
+                <span>★</span>
+                <span>{repo.stars}</span>
+              </div>
             </a>
+          ))
+        }
+      </div>
+    </BentoItem>
+
+    <!-- Lenguajes -->
+    <BentoItem class="md:col-span-1" title="Lenguajes">
+      <div id="github-languages" class="space-y-3 h-full">
+        {
+          topLanguages.map((lang) => (
+            <div class="flex items-center gap-3">
+              <div
+                class="w-3 h-3 rounded-full shrink-0"
+                style={`background-color: ${lang.color}`}
+              />
+              <span class="text-sm text-gray-300 flex-grow">{lang.name}</span>
+              <div class="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full"
+                  style={`width: ${lang.percentage}%; background-color: ${lang.color}`}
+                />
+              </div>
+              <span class="text-[10px] text-gray-500 w-8 text-right">
+                {lang.percentage}%
+              </span>
+            </div>
+          ))
+        }
+      </div>
+    </BentoItem>
+
+    <!-- ROW 2: Contribuciones (Full Width) -->
+    <BentoItem
+      class="md:col-span-3 group cursor-pointer hover:border-accent/50 transition-colors"
+      title=""
+    >
+      <a
+        href={profile.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex flex-col h-full relative"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span
+              class="bg-accent text-black px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
+              >GIT</span
+            >
+            <span class="text-sm font-bold text-white">Contribuciones</span>
+          </div>
+          <span
+            class="text-[10px] text-gray-500 font-mono group-hover:text-gray-300 transition-colors"
+          >
+            Ver historial completo →
+          </span>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <canvas
+          id="contribution-graph"
+          class="w-full opacity-50 group-hover:opacity-100 transition-opacity"
+          style="height: 80px;"
+          aria-label="Gráfico de contribuciones de GitHub"
+          role="img"
+        ></canvas>
+      </a>
+    </BentoItem>
+  </div>
 
-            <a href="https://github.com/altaskur/OpenTimeTracker" target="_blank" rel="noopener noreferrer"
-               class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10">
-                <div class="flex items-center justify-between">
-                    <span class="font-mono text-xs text-accent">TypeScript</span>
-                    <span class="font-mono text-xs text-gray-600">↗</span>
-                </div>
-                <h4 class="text-base font-medium text-white group-hover:text-accent transition-colors">OpenTimeTracker</h4>
-                <p class="text-sm text-gray-500 leading-relaxed">Herramienta personal de seguimiento de tareas y tiempo. Mantenida y en evolución activa.</p>
-            </a>
-
-            <a href="https://github.com/altaskur/accesibilidad-en-dos-tiempos" target="_blank" rel="noopener noreferrer"
-               class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10">
-                <div class="flex items-center justify-between">
-                    <span class="font-mono text-xs text-accent">Talk · DevFest 2025</span>
-                    <span class="font-mono text-xs text-gray-600">↗</span>
-                </div>
-                <h4 class="text-base font-medium text-white group-hover:text-accent transition-colors">Accesibilidad en dos tiempos</h4>
-                <p class="text-sm text-gray-500 leading-relaxed">Charla dual con Carolina Ruzafa Peña. Materiales y demos de la ponencia en GDG Alicante.</p>
-            </a>
-
-            <a href="https://github.com/altaskur/IABackend" target="_blank" rel="noopener noreferrer"
-               class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10">
-                <div class="flex items-center justify-between">
-                    <span class="font-mono text-xs text-accent">Angular · Node.js · Ollama</span>
-                    <span class="font-mono text-xs text-gray-600">↗</span>
-                </div>
-                <h4 class="text-base font-medium text-white group-hover:text-accent transition-colors">Serie IA local</h4>
-                <p class="text-sm text-gray-500 leading-relaxed">LLMs locales vía Ollama con frontends Angular 19 y backends Node.js/Express. Sin APIs externas.</p>
-            </a>
-
-            <a href="https://github.com/altaskur/RetroCam" target="_blank" rel="noopener noreferrer"
-               class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10">
-                <div class="flex items-center justify-between">
-                    <span class="font-mono text-xs text-accent">Canvas API · JavaScript</span>
-                    <span class="font-mono text-xs text-gray-600">↗</span>
-                </div>
-                <h4 class="text-base font-medium text-white group-hover:text-accent transition-colors">RetroCam</h4>
-                <p class="text-sm text-gray-500 leading-relaxed">Webcam en modo ASCII y estilo Gameboy Camera. Manipulación de canvas pixel a pixel.</p>
-            </a>
-
-            <a href="https://github.com/altaskur/portfolio-2026" target="_blank" rel="noopener noreferrer"
-               class="project-card md:col-span-2 group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10">
-                <div class="flex items-center justify-between">
-                    <span class="font-mono text-xs text-accent">Astro · TypeScript · GSAP</span>
-                    <span class="font-mono text-xs text-gray-600">↗</span>
-                </div>
-                <h4 class="text-base font-medium text-white group-hover:text-accent transition-colors">Portfolio personal</h4>
-                <p class="text-sm text-gray-500 leading-relaxed">El propio altaskur.dev. Astro, animaciones GSAP y accesibilidad WCAG como estándar.</p>
-            </a>
-
-        </div>
+  <!-- Proyectos destacados -->
+  <div class="mt-20 border-t border-gray-800 pt-16">
+    <div
+      class="mb-10 flex items-end justify-between projects-header opacity-0 translate-y-10"
+    >
+      <h3 class="text-2xl font-bold text-white md:text-3xl">
+        <span class="text-accent">///</span> Proyectos destacados
+      </h3>
+      <a
+        href="https://github.com/altaskur"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block"
+      >
+        github.com/altaskur ↗
+      </a>
     </div>
 
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <a
+        href="https://github.com/altaskur/OpenTimeTracker"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10"
+      >
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-accent">TypeScript</span>
+          <span class="font-mono text-xs text-gray-600">↗</span>
+        </div>
+        <h4
+          class="text-base font-medium text-white group-hover:text-accent transition-colors"
+        >
+          OpenTimeTracker
+        </h4>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Herramienta personal de seguimiento de tareas y tiempo. Mantenida y en
+          evolución activa.
+        </p>
+      </a>
+
+      <a
+        href="https://github.com/altaskur/accesibilidad-en-dos-tiempos"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10"
+      >
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-accent">Talk · DevFest 2025</span>
+          <span class="font-mono text-xs text-gray-600">↗</span>
+        </div>
+        <h4
+          class="text-base font-medium text-white group-hover:text-accent transition-colors"
+        >
+          Accesibilidad en dos tiempos
+        </h4>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Charla dual con Carolina Ruzafa Peña. Materiales y demos de la
+          ponencia en GDG Alicante.
+        </p>
+      </a>
+
+      <a
+        href="https://github.com/altaskur/IABackend"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10"
+      >
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-accent"
+            >Angular · Node.js · Ollama</span
+          >
+          <span class="font-mono text-xs text-gray-600">↗</span>
+        </div>
+        <h4
+          class="text-base font-medium text-white group-hover:text-accent transition-colors"
+        >
+          Serie IA local
+        </h4>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          LLMs locales vía Ollama con frontends Angular 19 y backends
+          Node.js/Express. Sin APIs externas.
+        </p>
+      </a>
+
+      <a
+        href="https://github.com/altaskur/RetroCam"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="project-card group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10"
+      >
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-accent"
+            >Canvas API · JavaScript</span
+          >
+          <span class="font-mono text-xs text-gray-600">↗</span>
+        </div>
+        <h4
+          class="text-base font-medium text-white group-hover:text-accent transition-colors"
+        >
+          RetroCam
+        </h4>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Webcam en modo ASCII y estilo Gameboy Camera. Manipulación de canvas
+          pixel a pixel.
+        </p>
+      </a>
+
+      <a
+        href="https://github.com/altaskur/portfolio-2026"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="project-card md:col-span-2 group flex flex-col gap-3 rounded-xl border border-gray-800 bg-gray-900/40 p-6 transition-all hover:border-accent/50 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-accent opacity-0 translate-y-10"
+      >
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-accent"
+            >Astro · TypeScript · GSAP</span
+          >
+          <span class="font-mono text-xs text-gray-600">↗</span>
+        </div>
+        <h4
+          class="text-base font-medium text-white group-hover:text-accent transition-colors"
+        >
+          Portfolio personal
+        </h4>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          El propio altaskur.dev. Astro, animaciones GSAP y accesibilidad WCAG
+          como estándar.
+        </p>
+      </a>
+    </div>
+  </div>
 </section>
 
 <script>
-    import { gsap } from 'gsap';
-    import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-    gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger);
 
-    const initAnimations = () => {
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (prefersReducedMotion) return;
+  const drawContributionGraph = () => {
+    const canvas = document.getElementById('contribution-graph') as HTMLCanvasElement;
+    if (!canvas) return;
 
-        // Section header
-        const dashboardHeader = document.querySelector('.dashboard-header');
-        if (dashboardHeader) {
-            gsap.to(dashboardHeader, {
-                opacity: 1, y: 0,
-                duration: 0.8,
-                ease: 'power3.out',
-                scrollTrigger: {
-                    trigger: dashboardHeader,
-                    start: 'top 85%',
-                    end: 'top 15%',
-                    toggleActions: 'play reverse play reverse'
-                }
-            });
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const accentColor = getComputedStyle(document.documentElement)
+      .getPropertyValue('--color-accent').trim() || '#a3e635';
+    const emptyColor = 'rgba(31,41,55,0.3)';
+
+    const WEEKS = 52;
+    const DAYS = 7;
+    const GAP = 2;
+
+    const dpr = window.devicePixelRatio || 1;
+    const displayW = canvas.offsetWidth;
+    const displayH = canvas.offsetHeight || 80;
+
+    canvas.width = displayW * dpr;
+    canvas.height = displayH * dpr;
+    ctx.scale(dpr, dpr);
+
+    const cellW = (displayW - GAP * (WEEKS - 1)) / WEEKS;
+    const cellH = (displayH - GAP * (DAYS - 1)) / DAYS;
+    const radius = Math.min(cellW, cellH) * 0.2;
+
+    for (let w = 0; w < WEEKS; w++) {
+      for (let d = 0; d < DAYS; d++) {
+        const rand = Math.random();
+        const hasActivity = rand > 0.7;
+        const x = w * (cellW + GAP);
+        const y = d * (cellH + GAP);
+
+        ctx.beginPath();
+        ctx.roundRect(x, y, cellW, cellH, radius);
+
+        if (hasActivity) {
+          ctx.globalAlpha = rand * 0.7 + 0.3;
+          ctx.fillStyle = accentColor;
+        } else {
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = emptyColor;
         }
-
-        // GitHub bento cards
-        const bentoItems = document.querySelectorAll('#dashboard .bento-item');
-        if (bentoItems.length > 0) {
-            bentoItems.forEach((item, index) => {
-                gsap.fromTo(item,
-                    { opacity: 0, y: 30 },
-                    {
-                        opacity: 1, y: 0,
-                        duration: 0.6,
-                        delay: index * 0.1,
-                        ease: 'power2.out',
-                        scrollTrigger: {
-                            trigger: item,
-                            start: 'top 85%',
-                            end: 'bottom 15%',
-                            toggleActions: 'play reverse play reverse'
-                        }
-                    }
-                );
-            });
-        }
-
-        // Proyectos destacados — header
-        const projectsHeader = document.querySelector('.projects-header');
-        if (projectsHeader) {
-            gsap.to(projectsHeader, {
-                opacity: 1, y: 0,
-                duration: 0.6,
-                ease: 'power2.out',
-                scrollTrigger: {
-                    trigger: projectsHeader,
-                    start: 'top 85%',
-                    end: 'top 15%',
-                    toggleActions: 'play reverse play reverse'
-                }
-            });
-        }
-
-        // Proyectos destacados — cards
-        const projectCards = document.querySelectorAll('.project-card');
-        if (projectCards.length > 0) {
-            projectCards.forEach((card, index) => {
-                gsap.to(card, {
-                    opacity: 1, y: 0,
-                    duration: 0.5,
-                    delay: index * 0.08,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: card,
-                        start: 'top 85%',
-                        end: 'bottom 15%',
-                        toggleActions: 'play reverse play reverse'
-                    }
-                });
-            });
-        }
-    };
-
-    // Run on page load
-    document.addEventListener('astro:page-load', initAnimations);
-    document.addEventListener('DOMContentLoaded', initAnimations);
-
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(initAnimations, 100);
+        ctx.fill();
+      }
     }
+    ctx.globalAlpha = 1;
+  };
+
+  const initAnimations = () => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    // Section header
+    const dashboardHeader = document.querySelector(".dashboard-header");
+    if (dashboardHeader) {
+      gsap.to(dashboardHeader, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: dashboardHeader,
+          start: "top 85%",
+          end: "top 15%",
+          toggleActions: "play reverse play reverse",
+        },
+      });
+    }
+
+    // GitHub bento cards
+    const bentoItems = document.querySelectorAll("#dashboard .bento-item");
+    if (bentoItems.length > 0) {
+      bentoItems.forEach((item, index) => {
+        gsap.fromTo(
+          item,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: index * 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: item,
+              start: "top 85%",
+              end: "bottom 15%",
+              toggleActions: "play reverse play reverse",
+            },
+          },
+        );
+      });
+    }
+
+    // Proyectos destacados — header
+    const projectsHeader = document.querySelector(".projects-header");
+    if (projectsHeader) {
+      gsap.to(projectsHeader, {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: projectsHeader,
+          start: "top 85%",
+          end: "top 15%",
+          toggleActions: "play reverse play reverse",
+        },
+      });
+    }
+
+    // Proyectos destacados — cards
+    const projectCards = document.querySelectorAll(".project-card");
+    if (projectCards.length > 0) {
+      projectCards.forEach((card, index) => {
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          delay: index * 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+            end: "bottom 15%",
+            toggleActions: "play reverse play reverse",
+          },
+        });
+      });
+    }
+  };
+
+  const init = () => {
+    drawContributionGraph();
+    initAnimations();
+  };
+
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("DOMContentLoaded", init);
+
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    setTimeout(init, 100);
+  }
 </script>
