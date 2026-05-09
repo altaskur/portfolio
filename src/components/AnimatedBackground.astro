@@ -1,7 +1,7 @@
 ---
 ---
 
-<canvas id="hero-canvas" class="absolute inset-0 z-0 opacity-60 pointer-events-none"></canvas>
+<canvas id="hero-canvas" class="absolute inset-0 z-0 opacity-60 pointer-events-none" aria-hidden="true" role="presentation"></canvas>
 
 <script>
     const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
@@ -125,6 +125,13 @@
 
     // Event Listeners - resize only
     window.addEventListener('resize', resize);
-    resize();
-    animate();
+
+    // Respect prefers-reduced-motion: hide canvas and skip animation loop
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+        canvas.style.display = 'none';
+    } else {
+        resize();
+        animate();
+    }
 </script>

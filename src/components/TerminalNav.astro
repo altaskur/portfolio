@@ -1,10 +1,12 @@
 ---
 const navItems = [
     { name: "intro", href: "#hero", label: "01" },
-    { name: "github", href: "#dashboard", label: "02" },
-    { name: "blog", href: "#blog", label: "03" },
-    { name: "media", href: "#media", label: "04" },
-    { name: "social", href: "#social", label: "05" },
+    { name: "sobre mí", href: "#about", label: "02" },
+    { name: "trabajo", href: "#experience", label: "03" },
+    { name: "proyectos", href: "#dashboard", label: "04" },
+    { name: "blog", href: "#blog", label: "05" },
+    { name: "charlas", href: "#media", label: "06" },
+    { name: "social", href: "#social", label: "07" },
 ];
 ---
 
@@ -20,7 +22,7 @@ const navItems = [
                 </div>
                 <span id="ai-trigger" class="font-mono text-xs text-gray-400 hidden sm:inline cursor-pointer hover:text-accent transition-colors group" title="Ask AI about me">
                     altaskur@portfolio:~
-                    <span class="text-accent/60 group-hover:text-accent animate-pulse">[?]</span>
+                    <span class="text-accent/60 group-hover:text-accent motion-safe:animate-pulse">[?]</span>
                 </span>
             </div>
             
@@ -132,7 +134,7 @@ const navItems = [
         });
 
         // Active section highlighting
-        const sections = ['hero', 'dashboard', 'blog', 'media', 'social'];
+        const sections = ['hero', 'about', 'experience', 'dashboard', 'blog', 'media', 'social'];
         
         sections.forEach(sectionId => {
             const section = document.getElementById(sectionId);
@@ -160,15 +162,18 @@ const navItems = [
             });
         }
 
-        // Initial entrance animation - wait for boot screen to finish
-        gsap.set(header, { y: -50, opacity: 0 });
-        gsap.to(header, {
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            delay: 2, // Wait for boot screen animation
-            ease: 'power3.out'
-        });
+        // Initial entrance animation — only play once across both events
+        if (!(window as any).__navEntrancePlayed) {
+            (window as any).__navEntrancePlayed = true;
+            gsap.set(header, { y: -50, opacity: 0 });
+            gsap.to(header, {
+                y: 0,
+                opacity: 1,
+                duration: 0.6,
+                delay: 0.2,
+                ease: 'power3.out'
+            });
+        }
 
         // Setup AI Trigger
         setupAITrigger();

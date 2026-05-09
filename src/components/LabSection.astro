@@ -50,8 +50,8 @@ const getProxyImage = (url: string) => {
 
 <section id="blog" class="px-4 py-20 md:px-10">
     <div class="mb-16 flex items-end justify-between">
-        <h2 class="text-3xl font-bold text-white md:text-5xl"><span class="text-accent">03.</span> The Blog</h2>
-        <a href="https://dev.to/altaskur" target="_blank" class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">/// DEV.TO ARTICLES</a>
+        <h2 class="blog-header text-3xl font-bold text-white md:text-4xl opacity-0 translate-y-8"><span class="text-accent">05.</span> El blog</h2>
+        <a href="https://dev.to/altaskur" target="_blank" class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">/// artículos en dev.to</a>
     </div>
 
     <div class="space-y-32">
@@ -67,12 +67,12 @@ const getProxyImage = (url: string) => {
                     <a href={article.url} target="_blank" rel="noopener noreferrer" class="block group/title">
                         <h3 class="text-3xl font-bold text-white md:text-4xl group-hover/title:text-accent transition-colors">{article.title}</h3>
                     </a>
-                    <p class="text-lg text-gray-400">{article.description || "Read the full article on Dev.to"}</p>
+                    <p class="text-lg text-gray-400">{article.description || "Leer el artículo completo en Dev.to"}</p>
                     
                     <div class="flex items-center gap-6 pt-4">
                         <a href={article.url} target="_blank" class="text-sm font-bold text-white hover:text-accent transition-colors flex items-center gap-2">
-                            READ_ARTICLE 
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                            Leer artículo →
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                         </a>
                         <span class="text-sm font-mono text-gray-600">{new Date(article.published_at).toLocaleDateString()}</span>
                     </div>
@@ -89,7 +89,7 @@ const getProxyImage = (url: string) => {
                     ) : (
                         <div class="absolute inset-0 flex items-center justify-center bg-[#0a0a0a] group-hover:bg-black transition-colors">
                             <div class="transform group-hover:scale-110 transition-transform duration-300">
-                                <img src="/assets/devto-icon.png" alt="Dev.to Logo" class="w-16 h-16 object-contain" />
+                                <img src="/assets/devto-icon.webp" alt="Dev.to Logo" class="w-16 h-16 object-contain" width="64" height="64" />
                             </div>
                             <span class="absolute bottom-4 font-mono text-xs text-gray-500 group-hover:text-white transition-colors">./article_{index + 1}.md</span>
                         </div>
@@ -117,6 +117,22 @@ const getProxyImage = (url: string) => {
     gsap.registerPlugin(ScrollTrigger);
 
     const initBlogAnimations = () => {
+        // Section header
+        const blogHeader = document.querySelector('.blog-header');
+        if (blogHeader) {
+            gsap.to(blogHeader, {
+                opacity: 1, y: 0,
+                duration: 0.8,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: blogHeader,
+                    start: 'top 85%',
+                    end: 'top 15%',
+                    toggleActions: 'play reverse play reverse'
+                }
+            });
+        }
+
         const cards = document.querySelectorAll('.lab-card');
 
         cards.forEach((card) => {
@@ -129,7 +145,7 @@ const getProxyImage = (url: string) => {
                     trigger: card,
                     start: "top 80%",
                     end: "bottom 20%",
-                    toggleActions: "play none none reverse"
+                    toggleActions: "play reverse play reverse"
                 }
             });
         });

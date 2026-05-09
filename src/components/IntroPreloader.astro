@@ -8,14 +8,14 @@ import AnimatedBackground from './AnimatedBackground.astro';
     </div>
     <div class="relative z-10">
         <div id="boot-text" class="whitespace-pre-wrap"></div>
-        <div class="mt-2 text-accent animate-pulse">_</div>
+        <div class="mt-2 text-accent animate-pulse" aria-hidden="true">_</div>
     </div>
 </div>
 
 <script>
     import { gsap } from "gsap";
 
-    const bootText = [
+    const bootLines = [
         "INITIALIZING DARK SYSTEMS PROTOCOL...",
         "LOADING KERNEL MODULES: [GSAP, LENIS, TAILWIND]",
         "ESTABLISHING SECURE CONNECTION...",
@@ -25,50 +25,52 @@ import AnimatedBackground from './AnimatedBackground.astro';
         "BOOT SEQUENCE COMPLETE."
     ];
 
-    const bootScreen = document.getElementById('boot-screen');
-    const textContainer = document.getElementById('boot-text');
+    const bootScreen = document.getElementById("boot-screen");
+    const textContainer = document.getElementById("boot-text");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const tl = gsap.timeline({
-        onComplete: () => {
+    if (prefersReducedMotion) {
+        if (bootScreen) bootScreen.style.display = "none";
+    } else {
+        const exitBootScreen = () => {
+            if (!bootScreen) return;
             gsap.to(bootScreen, {
                 yPercent: -100,
                 duration: 0.8,
                 ease: "power4.inOut",
-                delay: 0.2
+                delay: 0.2,
+                onComplete: () => {
+                    bootScreen.style.display = "none";
+                }
             });
-        }
-    });
+        };
 
-    bootText.forEach((line, index) => {
-        tl.to(textContainer, {
-            text: {
-                value: bootText.slice(0, index + 1).join("\n"),
-                delimiter: ""
-            },
-            duration: 0.1 + Math.random() * 0.3,
-            ease: "none",
-        }, "+=0.1");
-    });
-    
-    // Ensure TextPlugin is registered if using GSAP TextPlugin, otherwise use simple innerHTML appending
-    // Since we didn't install TextPlugin, let's use a simple function
-    
-    // OVERRIDE: Simple custom typewriter to avoid dependency issues if TextPlugin isn't installed
-    tl.clear();
-    
-    let currentLines = [];
-    
-    bootText.forEach((_line, i) => {
-        tl.call(() => {
-            if (textContainer) {
-                 const div = document.createElement('div');
-                 div.className = "text-green-500 mb-1";
-                 if (i > 4) div.className = "text-accent mb-1"; 
-                 div.innerText = "> " + bootText[i];
-                 textContainer.appendChild(div);
+        const tl = gsap.timeline({ onComplete: exitBootScreen });
+
+        // Use tl.to() with duration so the timeline has real tweens to sequence —
+        // tl.call()-only timelines with "+=" offsets can stall in Vite/HMR environments.
+        bootLines.forEach((line, i) => {
+            tl.to({}, {
+                duration: 0.15,
+                onStart: () => {
+                    if (!textContainer) return;
+                    const div = document.createElement("div");
+                    div.className = i > 4 ? "text-accent mb-1" : "text-green-500 mb-1";
+                    div.innerText = "> " + line;
+                    textContainer.appendChild(div);
+                }
+            });
+        });
+
+        tl.to({}, { duration: 0.5 });
+
+        // Safety fallback: if the timeline fails for any reason, force-exit after a timeout
+        const safetyMs = (bootLines.length * 0.15 + 0.5 + 1.5) * 1000;
+        setTimeout(() => {
+            if (bootScreen && bootScreen.style.display !== "none") {
+                tl.kill();
+                exitBootScreen();
             }
-        }, null, "+=0.15"); // Delay between lines
-    });
-
-    tl.to({}, {duration: 0.5}); // Final pause
+        }, safetyMs);
+    }
 </script>

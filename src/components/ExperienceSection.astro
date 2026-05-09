@@ -1,0 +1,121 @@
+---
+const logros = [
+    {
+        categoria: "Angular enterprise",
+        items: [
+            "Referente técnico en proyecto de largo recorrido del sector agrotech: fases sucesivas con Angular 18, 19, 20 y 21 (+ SSR), levantando la arquitectura frontend inicial y manteniéndola a lo largo de cada evolución.",
+            "Lighthouse > 90% en Performance, Accesibilidad, Best Practices y SEO en aplicación pública tras refactor completo en Angular 21 con SSR.",
+            "Continuidad técnica y conocimiento de dominio en proyecto micro-frontend de ~9 meses con equipo muy cambiante.",
+        ]
+    },
+    {
+        categoria: "Accesibilidad",
+        items: [
+            "Impulso por iniciativa propia de la accesibilidad web: auditorías multi-herramienta (Lighthouse, WAVE, IBM Equal Access) y negociación con diseño para corregir violaciones WCAG.",
+        ]
+    },
+    {
+        categoria: "Gestión y transversalidad",
+        items: [
+            "Gestión de hasta 5 proyectos en paralelo durante Q2 2025 sin romper entregas.",
+            "Mentoring cross-equipo en Angular 19/20 a compañeros de otros proyectos.",
+            "Auditoría cross-equipo con detección y escalado de problemas de backend en un proyecto externo.",
+        ]
+    },
+    {
+        categoria: "Iniciativa técnica",
+        items: [
+            "Refactor completo del frontend de una aplicación interna con alta deuda técnica: análisis, planificación y ejecución autónoma desde cero.",
+            "Investigación y resolución autónoma de un problema persistente de autoplay de vídeo en tablets: análisis de causa raíz, solución aplicada y documentada.",
+            "App móvil multi-idioma para tablets con Ionic + Angular, desarrollada con fidelidad al diseño y soporte completo de i18n.",
+            "Investigación técnica sobre selección de stack CSS y setup de calidad de código (Husky/ESLint/Prettier), publicada en Dev.to.",
+        ]
+    },
+];
+---
+
+<section id="experience" class="px-4 py-20 md:px-10" aria-labelledby="experience-heading">
+
+    <div class="mb-16 flex items-end justify-between exp-header opacity-0 translate-y-10">
+        <h2 id="experience-heading" class="text-3xl font-bold text-white md:text-5xl">
+            <span class="text-accent">03.</span> Experiencia
+        </h2>
+        <span class="hidden font-mono text-sm text-gray-400 md:block">Consultora tecnológica · 2024 – presente</span>
+    </div>
+
+    <div class="space-y-16">
+        {logros.map(grupo => (
+            <div class="exp-group grid gap-6 md:grid-cols-[220px_1fr] opacity-0 translate-y-10">
+                <div class="pt-1">
+                    <span class="text-xs font-mono text-accent uppercase tracking-widest">
+                        {grupo.categoria}
+                    </span>
+                </div>
+                <ul class="space-y-4">
+                    {grupo.items.map(item => (
+                        <li class="flex gap-3 text-gray-400 leading-relaxed">
+                            <span class="text-accent mt-1 shrink-0" aria-hidden="true">→</span>
+                            <span>{item}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ))}
+    </div>
+
+
+</section>
+
+<script>
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const initExpAnimations = () => {
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (prefersReducedMotion) {
+            document.querySelectorAll(".exp-header, .exp-group").forEach(el => {
+                (el as HTMLElement).style.opacity = "1";
+                (el as HTMLElement).style.transform = "none";
+            });
+            return;
+        }
+
+        gsap.to(".exp-header", {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: "#experience",
+                start: "top 80%",
+                end: "top 15%",
+                toggleActions: "play reverse play reverse"
+            }
+        });
+
+        document.querySelectorAll(".exp-group").forEach((group, i) => {
+            gsap.to(group, {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: group,
+                    start: "top 82%",
+                    end: "top 8%",
+                    toggleActions: "play reverse play reverse"
+                }
+            });
+        });
+
+    };
+
+    document.addEventListener("astro:page-load", initExpAnimations);
+    document.addEventListener("DOMContentLoaded", initExpAnimations);
+
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(initExpAnimations, 100);
+    }
+</script>
