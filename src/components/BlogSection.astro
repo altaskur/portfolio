@@ -1,5 +1,9 @@
----
+﻿---
 import { getCollection } from 'astro:content';
+
+const typeLabels: Record<string, string> = { article: 'artículo', experiment: 'experimento' };
+const getProxyImage = (url: string) =>
+    `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=800&q=80`;
 
 const localPosts = await getCollection('blog', ({ data }) => !data.draft);
 
@@ -8,8 +12,8 @@ const localArticles = localPosts.map(post => ({
     description: post.data.description,
     url: `/blog/${post.id.replace(/\.(md|mdx)$/, '')}`,
     published_at: post.data.publishDate.toISOString(),
-    tag_list: [post.data.type],
-    cover_image: null as string | null,
+    tag_list: [typeLabels[post.data.type] ?? post.data.type],
+    cover_image: post.data.coverImage ?? null,
     source: 'local' as const,
 }));
 
@@ -44,9 +48,6 @@ try {
 const allArticles = [...localArticles, ...devtoArticles]
     .sort((a, b) => new Date(b.published_at).valueOf() - new Date(a.published_at).valueOf())
     .slice(0, 3);
-
-const getProxyImage = (url: string) =>
-    `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=800&q=80`;
 ---
 
 <section id="blog" class="px-4 py-20 md:px-10">
@@ -54,13 +55,13 @@ const getProxyImage = (url: string) =>
         <h2 class="blog-header text-3xl font-bold text-white md:text-4xl opacity-0 translate-y-8">
             <span class="text-accent">05.</span> El blog
         </h2>
-        <a href="https://dev.to/altaskur" target="_blank" rel="noopener noreferrer"
+        <a href="/blog"
            class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">
-            /// artículos en dev.to
+            /// ver todos →
         </a>
     </div>
 
-    <div class="space-y-32">
+    <div class="space-y-16 md:space-y-32">
         {allArticles.map((article, index) => {
             const isLocal = article.source === 'local';
             const isExternal = !isLocal;
@@ -75,7 +76,7 @@ const getProxyImage = (url: string) =>
                         </div>
 
                         <a href={article.url} {...extAttrs} class="block group/title">
-                            <h3 class="text-3xl font-bold text-white md:text-4xl group-hover/title:text-accent transition-colors">
+                            <h3 class="text-2xl font-bold text-white md:text-3xl lg:text-4xl group-hover/title:text-accent transition-colors">
                                 {article.title}
                             </h3>
                         </a>
@@ -96,11 +97,11 @@ const getProxyImage = (url: string) =>
                             )}
 
                             <a href={article.url} {...extAttrs} class="text-sm font-bold text-white hover:text-accent transition-colors flex items-center gap-2">
-                                Leer artículo
+                                Leer articulo
                                 {isExternal ? (
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                                 ) : (
-                                    <span aria-hidden="true">→</span>
+                                    <span aria-hidden="true">-></span>
                                 )}
                             </a>
 
@@ -129,7 +130,7 @@ const getProxyImage = (url: string) =>
 
                         {article.cover_image ? (
                             <img
-                                src={getProxyImage(article.cover_image)}
+                                src={isLocal ? article.cover_image : getProxyImage(article.cover_image)}
                                 alt={article.title}
                                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 loading="lazy"
@@ -148,44 +149,54 @@ const getProxyImage = (url: string) =>
                                 </div>
                             </div>
                         )}
-
                         <div class="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </a>
                 </article>
             );
         })}
     </div>
+
+    <div class="mt-16 md:mt-24 flex justify-center">
+        <a
+            href="/blog"
+            class="group inline-flex items-center gap-3 font-mono text-sm font-bold text-white bg-accent/10 border border-accent/40 px-8 py-4 rounded-xl hover:bg-accent hover:text-black hover:border-accent transition-all duration-300"
+        >
+            <span class="text-accent group-hover:text-black transition-colors">$</span>
+            ver todos los artículos
+            <span class="translate-x-0 group-hover:translate-x-1 transition-transform duration-300">→</span>
+        </a>
+    </div>
 </section>
 
 <script>
-    import { gsap } from "gsap";
-    import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-    gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger);
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    gsap.to(".blog-header", {
+gsap.to(".blog-header", {
+    opacity: 1,
+    y: 0,
+    duration: prefersReducedMotion ? 0 : 0.8,
+    ease: "power2.out",
+    scrollTrigger: {
+        trigger: "#blog",
+        start: "top 80%",
+    }
+});
+
+gsap.utils.toArray<HTMLElement>(".lab-card").forEach((card) => {
+    gsap.to(card, {
         opacity: 1,
         y: 0,
-        duration: prefersReducedMotion ? 0 : 0.8,
+        duration: prefersReducedMotion ? 0 : 0.9,
         ease: "power2.out",
         scrollTrigger: {
-            trigger: "#blog",
-            start: "top 80%",
+            trigger: card,
+            start: "top 85%",
         }
     });
-
-    gsap.utils.toArray<HTMLElement>(".lab-card").forEach((card) => {
-        gsap.to(card, {
-            opacity: 1,
-            y: 0,
-            duration: prefersReducedMotion ? 0 : 0.9,
-            ease: "power2.out",
-            scrollTrigger: {
-                trigger: card,
-                start: "top 85%",
-            }
-        });
-    });
+});
 </script>

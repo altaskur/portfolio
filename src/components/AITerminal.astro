@@ -1,562 +1,1248 @@
 ---
+import { getCollection } from "astro:content";
+import { terminalData } from "../data/terminal";
+
+const blogPosts = await getCollection("blog", ({ data }) => !data.draft);
+const projectPosts = await getCollection("projects");
+
+const payload = {
+  ...terminalData,
+  blog: blogPosts
+    .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+    .map((p) => ({
+      id: p.id.replace(/\.(md|mdx)$/, ""),
+      title: p.data.title,
+      description: p.data.description,
+      date: p.data.publishDate.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }),
+      type: p.data.type,
+      coverImage: p.data.coverImage ?? null,
+    })),
+  projects: projectPosts.map((p) => ({
+    id: p.id.replace(/\.(md|mdx)$/, ""),
+    title: p.data.title,
+    description: (p.data as any).description ?? "",
+  })),
+};
 ---
 
-<!-- AI Terminal Modal -->
-<div id="ai-terminal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 md:p-8 overflow-hidden" style="cursor: default;">
-    <!-- Backdrop -->
-    <div id="ai-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-    
-    <!-- Terminal Window -->
-    <div id="ai-window" class="relative w-full max-w-2xl rounded-xl border border-gray-700 bg-gray-900/95 shadow-2xl backdrop-blur-xl overflow-hidden transform scale-95 opacity-0 flex flex-col" style="max-height: 80vh; cursor: default;">
-        <!-- Terminal Header -->
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-black/50 shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="flex gap-1.5">
-                    <button id="ai-close-btn" class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer" title="Close (ESC)"></button>
-                    <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
-                    <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
-                </div>
-                <span class="font-mono text-xs text-gray-400">altaskur@portfolio:~/ask-me</span>
-            </div>
-            <button id="ai-close-x" class="text-gray-500 hover:text-white transition-colors p-1" title="Close">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
+<script
+  id="t-data"
+  type="application/json"
+  set:html={JSON.stringify(payload)}
+/>
+
+<div
+  id="ai-terminal"
+  class="fixed inset-0 z-[200] hidden items-center justify-center p-3 md:p-8"
+  style="cursor:default"
+>
+  <div id="ai-backdrop" class="absolute inset-0 bg-black/85 backdrop-blur-md">
+  </div>
+
+  <div
+    id="ai-window"
+    class="relative w-full max-w-2xl rounded-xl border border-gray-700/80 shadow-[0_0_60px_rgba(59,130,246,0.12)] overflow-hidden flex flex-col terminal-win"
+    style="max-height:84vh;cursor:default"
+  >
+    <!-- Scanlines overlay -->
+    <div class="scanlines pointer-events-none" aria-hidden="true"></div>
+
+    <!-- Title bar -->
+    <div
+      class="flex items-center justify-between px-4 py-2.5 border-b border-gray-800/60 bg-black/70 shrink-0 relative z-10"
+    >
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5">
+          <button
+            id="ssh-close-dot"
+            class="w-3 h-3 rounded-full bg-red-500/90 hover:bg-red-400 transition-colors cursor-pointer"
+            title="Cerrar (ESC)"></button>
+          <span class="w-3 h-3 rounded-full bg-yellow-500/60"></span>
+          <span class="w-3 h-3 rounded-full bg-blue-500/60"></span>
         </div>
-        
-        <!-- Chat Messages -->
-        <div id="ai-messages" class="flex-1 p-4 space-y-4 overflow-y-auto scroll-smooth" data-lenis-prevent>
-            <!-- Messages will be added here by JS -->
-        </div>
-        
-        <!-- Input Area -->
-        <div class="border-t border-gray-800 p-4 bg-black/30 shrink-0">
-            <form id="ai-form" class="flex items-center gap-3">
-                <span class="text-accent font-mono text-sm shrink-0">visitor:~$</span>
-                <input 
-                    type="text" 
-                    id="ai-input" 
-                    placeholder="Type a command or question..."
-                    class="flex-1 bg-transparent border-none outline-none text-white font-mono text-sm placeholder:text-gray-600"
-                    autocomplete="off"
-                />
-                <button type="submit" class="text-accent hover:text-white transition-colors p-1" aria-label="Send">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-            <p class="text-[10px] text-gray-600 mt-2 font-mono">Press ESC to close • Type "help" for commands</p>
-        </div>
+        <span class="font-mono text-[11px] text-gray-500 select-none"
+          >ssh altaskur@portfolio.dev</span
+        >
+      </div>
+      <div class="flex items-center gap-3">
+        <span
+          class="hidden sm:flex items-center gap-1.5 font-mono text-[10px] text-gray-600"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"
+          ></span>
+          connected
+        </span>
+        <button
+          id="ssh-close-x"
+          class="text-gray-600 hover:text-gray-300 transition-colors p-1 cursor-pointer relative z-10"
+          title="Cerrar"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            ><line x1="18" y1="6" x2="6" y2="18"></line><line
+              x1="6"
+              y1="6"
+              x2="18"
+              y2="18"></line></svg
+          >
+        </button>
+      </div>
     </div>
+
+    <!-- Output area -->
+    <div
+      id="ssh-output"
+      class="flex-1 px-4 py-3 overflow-y-auto font-mono text-sm terminal-body relative z-10 space-y-px"
+      data-lenis-prevent
+    >
+    </div>
+
+    <!-- Input area -->
+    <div
+      class="border-t border-gray-800/50 px-4 py-3 bg-black/60 shrink-0 relative z-10"
+    >
+      <form id="ssh-form" class="flex items-center gap-2">
+        <span
+          id="ssh-prompt"
+          class="text-blue-400 font-mono text-sm shrink-0 whitespace-nowrap select-none"
+        ></span>
+        <input
+          id="ssh-input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          class="flex-1 bg-transparent border-none outline-none text-blue-200 font-mono text-sm caret-blue-400 min-w-0"
+          aria-label="Terminal input"
+        />
+      </form>
+      <div id="ssh-chips" class="flex gap-2 mt-2.5 flex-wrap"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-    interface ChatMessage {
-        role: 'user' | 'assistant';
-        content: string;
-    }
+  import { gsap } from "gsap";
 
-    const aiTerminal = document.getElementById('ai-terminal');
-    const aiBackdrop = document.getElementById('ai-backdrop');
-    const aiWindow = document.getElementById('ai-window');
-    const aiCloseBtn = document.getElementById('ai-close-btn');
-    const aiCloseX = document.getElementById('ai-close-x');
-    const aiForm = document.getElementById('ai-form') as HTMLFormElement;
-    const aiInput = document.getElementById('ai-input') as HTMLInputElement;
-    const aiMessages = document.getElementById('ai-messages');
+  // ─── Datos desde build time ────────────────────────────────────────────────
+  const DATA = JSON.parse(
+    document.getElementById("t-data")!.textContent!,
+  ) as typeof import("../data/terminal").terminalData & {
+    blog: {
+      id: string;
+      title: string;
+      description: string;
+      date: string;
+      type: string;
+    }[];
+    projects: { id: string; title: string; description: string }[];
+  };
 
-    let chatHistory: ChatMessage[] = [];
-    let isOpen = false;
+  // ─── Filesystem construido desde DATA ──────────────────────────────────────
+  type FSNode =
+    | { type: "dir"; children: string[] }
+    | { type: "file"; content: string; url?: string };
 
-    // Multiple responses per category for variety
-    const responses: Record<string, string[]> = {
-        'help': [
-            `📋 Available commands:
+  function buildFS(): Record<string, FSNode> {
+    const fs: Record<string, FSNode> = {};
 
-• help - Show available commands
-• about - Learn about Isaac
-• skills - Technical skills
-• projects - Featured projects  
-• experience - Work history
-• contact - How to reach me
-• blog - Recent articles
-• stack - Tech stack
-• hobbies - Personal interests
-• clear - Clear chat
-
-Just type a command or ask me anything! 🚀`,
-        ],
-        
-        'about': [
-            `Isaac (Altaskur) is a Software Developer specializing in Angular. Based in Alicante, Spain, he focuses on accessible, clean code and scalable architectures. 🇪🇸`,
-            `Hey! Isaac here. I'm a collaborative Software Developer who values empathy, clear communication, and code quality. Driven by curiosity and a passion for great UX! 🚀`,
-            `I'm Isaac, a Spanish developer with a strong focus on problem-solving and cross-team collaboration. Quality, accessibility, and meaningful code are my priorities! ✨`,
-        ],
-        
-        'skills': [
-            `🛠️ My Technical Arsenal:
-
-Core: HTML5, CSS3 (Flexbox/Grid), JS (ES6+), TypeScript
-Frameworks: Angular 20+ (Main), React (Familiar), RxJS, NgRx
-Testing: Jest, Testing Library
-Tools: Git, Webpack/Vite, SonarQube, Figma
-
-Plus a focus on Accessibility (a11y) and Responsive Design! 💡`,
-            `⚡ Key Skills:
-
-• Angular Ecosystem (Signal, RxJS, NgRx)
-• Clean Code, CDD & UI/UX Best Practices
-• REST APIs, JSON, Fetch/Axios
-• CI/CD Pipelines & Agile Workflows
-
-I care about performance and maintainability! 🔧`,
-            `Soft Skills are just as important! 🧠
-
-• Critical thinking & Problem solving
-• Empathy & Cross-team collaboration
-• Clear technical communication
-• Consistency & Curiosity
-
-And yes, I use Figma too! 🎨`,
-        ],
-        
-        'projects': [
-            `🚀 Some things I've built:
-
-1. OpenTimeTracker - Time tracking app (TypeScript)
-2. This Portfolio - Built with Astro
-3. Lateteriaelda - E-commerce with Vue.js
-
-Check the Projects section for more! 📁`,
-            `Featured projects:
-
-• OpenTimeTracker: Open-source time management
-• Portfolio 2026: You're looking at it! 
-• Various e-commerce & web apps
-
-I'm always working on something new! 🛠️`,
-            `My recent work includes this portfolio (Astro + animations), an open-source time tracker, and several Vue.js projects. Scroll down to see more! 👇`,
-        ],
-        
-        'experience': [
-            `💼 Angular Developer:
-
-• Developing scalable Angular applications
-• Utilizing Scrum/Agile workflows
-• Code reviews & Pair programming
-• Focus on long-term maintainability
-
-Collaboration is key! 🤝`,
-            `Professional Journey: 
-
-Current: Angular Dev
-Focus: Enterprise apps, Clean Code, Performance
-
-I love understanding the context and purpose behind every feature! 🎯`,
-            `Currently building with Angular!
-
-I bring critical thinking, accessibility focus, and a collaborative mindset to every project. Plus, I handle end-to-end testing and optimization! 🚀`,
-        ],
-        
-        'contact': [
-            `📬 Let's get social!
-
-GitHub: github.com/altaskur
-LinkedIn: linkedin.com/in/isaac-julián/
-Website: altaskur.dev
-
-Let's discuss technology and great products! 👋`,
-            `Want to chat? Here's how:
-
-• GitHub → github.com/altaskur
-• LinkedIn → linkedin.com/in/isaac-julián/
-
-Don't be a stranger! ✉️`,
-            `Reach out anytime! 
-
-GitHub or LinkedIn (linkedin.com/in/isaac-julián/). Whether it's a job opportunity, collab, or just saying hi – I'm all ears! 🎧`,
-        ],
-        
-        'stack': [
-            `⚡ This site runs on Astro, but my daily stack is:
-
-• Angular 20+ (Signals & Clean Arch)
-• Jest / Testing Library
-• CI/CD (GitHub Actions / GitLab CI)
-• Figma for design hand-off
-
-Fullstack capable with Node.js! 🅰️`,
-            `My professional ecosystem:
-
-Angular ecosystem + TypeScript
-State: Signals / NgRx
-Styles: SCSS / Tailwind (Personal)
-Quality: SonarQube, ESLint, Prettier
-
-Quality first! 🛡️`,
-            `Tech behind this site? Astro! 
-
-But at work I engineer with Angular, RxJS, and strict TypeScript. I also set up pipelines, handle code reviews, and ensure a11y standards. ⚡`,
-        ],
-        
-        'hobbies': [
-            `✨ When I'm not coding:
-
-• Reading tech blogs & news
-• Contributing to open source
-• Exploring new UI/UX trends
-• Lots of coffee ☕
-
-Continuous learning is my vibe! 🎯`,
-            `Outside of work? 
-
-I read about tech, watch coding tutorials, and drink way too much coffee. Also love discovering new music to code to! 🎵`,
-            `My hobbies: Open source contributions, tech podcasts, and exploring new frameworks just for fun! 🚀`,
-        ],
-        
-        'hello': [
-            `Hey there! 👋 Welcome! I'm here to tell you about Isaac. Type "help" to see what I can do!`,
-            `Hello! 👋 Nice to meet you! Ask me anything about Isaac's work, or type "help" for commands!`,
-            `Hi! 👋 Welcome to the portfolio! I'm your AI guide. Try typing "help" to get started!`,
-        ],
-        
-        'hi': [
-            `Hey! 👋 What would you like to know about Isaac?`,
-            `Hello there! 👋 Type "help" to see available commands!`,
-            `Hi! 👋 Ready to explore? Ask me anything!`,
-        ],
-        
-        'hola': [
-            `¡Hola! 👋 Bienvenido! I respond in English, but feel free to ask anything!`,
-            `¡Hey! 👋 ¿Qué tal? Type "help" to see what I can tell you about Isaac!`,
-            `¡Buenas! 👋 Welcome! Ask me about skills, projects, or anything else!`,
-        ],
-
-        'blog': [
-            `📝 Latest articles from Isaac's Dev.to:
-
-• Angular Accessibility
-• Scalable TS Patterns
-• Community & Streaming
-
-Check the Blog section to see them all! 📖`,
-            `You can find Isaac's technical writing in the Blog section. He regularly posts about Angular, TypeScript, and software architecture on Dev.to! ✍️`,
-        ],
-        'clear': [
-            `_CLEAR_`,
-        ],
+    // Root
+    fs["~"] = {
+      type: "dir",
+      children: [
+        "about.txt",
+        "README.md",
+        "skills.json",
+        "contact.txt",
+        "experience",
+        "blog",
+        "projects",
+        ".secret",
+      ],
     };
 
-    // Keywords for smart matching (English + Spanish)
-    const keywordMap: { keywords: string[], category: string }[] = [
-        { keywords: ['who', 'about', 'isaac', 'altaskur', 'yourself', 'quien', 'quién', 'sobre', 'presentate', 'preséntate', 'cuentame', 'cuéntame', 'eres'], category: 'about' },
-        { keywords: ['skill', 'technology', 'tech', 'know', 'programming', 'language', 'code', 'angular', 'signals', 'soft skills', 'figma', 'testing', 'jest', 'habilidad', 'tecnologia', 'tecnología', 'sabe', 'sabes', 'lenguaje', 'programa', 'blandas'], category: 'skills' },
-        { keywords: ['project', 'portfolio', 'made', 'built', 'create', 'proyecto', 'creado', 'hecho', 'construido'], category: 'projects' },
-        { keywords: ['experience', 'job', 'career', 'professional', 'history', 'company', 'worked', 'experiencia', 'trabajo', 'carrera', 'profesional', 'trabajado', 'empresa', 'laboral', 'trayectoria'], category: 'experience' },
-        { keywords: ['contact', 'email', 'reach', 'hire', 'message', 'talk', 'contacto', 'correo', 'contratar', 'mensaje', 'hablar', 'contactar'], category: 'contact' },
-        { keywords: ['stack', 'framework', 'tool', 'astro', 'vue', 'react', 'using', 'qa', 'quality', 'sonar', 'git', 'herramienta', 'usa', 'usas', 'utiliza', 'calidad'], category: 'stack' },
-        { keywords: ['hobby', 'hobbies', 'free time', 'fun', 'like', 'enjoy', 'interest', 'do for fun', 'pasatiempo', 'tiempo libre', 'gusta', 'aficion', 'afición', 'diversion', 'diversión'], category: 'hobbies' },
-        { keywords: ['experience', 'job', 'career', 'professional', 'history', 'company', 'worked', 'experiencia', 'trabajo', 'carrera', 'profesional', 'trabajado', 'empresa', 'laboral', 'trayectoria'], category: 'experience' },
-        { keywords: ['contact', 'email', 'reach', 'hire', 'message', 'talk', 'contacto', 'correo', 'contratar', 'mensaje', 'hablar', 'contactar'], category: 'contact' },
-        { keywords: ['stack', 'framework', 'tool', 'astro', 'vue', 'react', 'using', 'herramienta', 'usa', 'usas', 'utiliza'], category: 'stack' },
-        { keywords: ['blog', 'article', 'post', 'writing', 'dev.to', 'write', 'read', 'artículo', 'publicación', 'leer', 'escribir'], category: 'blog' },
-        { keywords: ['hobby', 'hobbies', 'free time', 'fun', 'like', 'enjoy', 'interest', 'do for fun', 'pasatiempo', 'tiempo libre', 'gusta', 'aficion', 'afición', 'diversion', 'diversión'], category: 'hobbies' },
+    // about.txt — desde DATA.about
+    fs["~/about.txt"] = { type: "file", content: DATA.about.join("\n") };
+
+    // README.md
+    const c = DATA.contact;
+    fs["~/README.md"] = {
+      type: "file",
+      content: [
+        "# altaskur.dev",
+        "",
+        `Portfolio de ${DATA.identity.name}.`,
+        "Construido con Astro, Tailwind y café.",
+        "",
+        "  Stack",
+        "  ─────────────────────",
+        "  Framework   Astro v6",
+        "  Estilos     Tailwind v4",
+        "  Animaciones GSAP + Lenis",
+        "  Terminal    tú estás aquí",
+        "",
+        "  Links",
+        "  ─────────────────────",
+        `  → ${c.github}`,
+        `  → ${c.devto}`,
+        `  → ${c.email}`,
+      ].join("\n"),
+    };
+
+    // skills.json — desde DATA.skills
+    const skillLines = ["{"];
+    Object.entries(DATA.skills).forEach(([k, v], i, arr) => {
+      const pad = " ".repeat(Math.max(0, 8 - k.length));
+      skillLines.push(
+        `  "${k}":${pad}[${(v as string[]).map((s) => `"${s}"`).join(", ")}]${i < arr.length - 1 ? "," : ""}`,
+      );
+    });
+    skillLines.push("}");
+    fs["~/skills.json"] = { type: "file", content: skillLines.join("\n") };
+
+    // contact.txt — desde DATA.contact
+    fs["~/contact.txt"] = {
+      type: "file",
+      content: [
+        `GitHub   → ${c.github}`,
+        `LinkedIn → ${c.linkedin}`,
+        `Dev.to   → ${c.devto}`,
+        `Mail     → ${c.email}`,
+        `Web      → ${c.web}`,
+      ].join("\n"),
+    };
+
+    // experience/cv.txt — desde DATA.experience
+    fs["~/experience"] = { type: "dir", children: ["cv.txt"] };
+    const expLines = [
+      "EXPERIENCIA",
+      "──────────────────────────────────────────",
     ];
+    DATA.experience.forEach((job) => {
+      expLines.push(
+        `${job.role}${" ".repeat(Math.max(1, 32 - job.role.length))}${job.period}`,
+      );
+      job.bullets.forEach((b) => expLines.push(`  · ${b}`));
+      expLines.push("");
+    });
+    expLines.push("FORMACIÓN", "──────────────────────────────────────────");
+    expLines.push("  · Desarrollo de Aplicaciones Web");
+    fs["~/experience/cv.txt"] = { type: "file", content: expLines.join("\n") };
 
-    // Default responses for unknown inputs
-    const defaultResponses = [
-        `Hmm, not sure about that! Try "help" to see what I can tell you about. 🤔`,
-        `Interesting question! I know about Isaac's skills, projects, and experience. Type "help" for options! 💡`,
-        `I'm focused on this portfolio. Try asking about projects, skills, or how to contact Isaac! 🚀`,
-        `That's beyond my knowledge! But I can tell you about Isaac's work. Type "help"! 📚`,
-        `Curious one, aren't you? 😄 Try "skills", "projects", or "about" to learn more!`,
+    // blog/ — desde colección real de Astro
+    const blogFiles = DATA.blog.map((p) => `${p.id}.md`);
+    fs["~/blog"] = { type: "dir", children: blogFiles };
+    DATA.blog.forEach((p) => {
+      fs[`~/blog/${p.id}.md`] = {
+        type: "file",
+        content: [
+          `# ${p.title}`,
+          `Publicado: ${p.date} · ${p.type}`,
+          "",
+          p.description,
+          "",
+          `→ altaskur.dev/blog/${p.id}`,
+        ].join("\n"),
+        url: `/blog/${p.id}`,
+      };
+    });
+
+    // projects/ — desde colección real de Astro
+    const projectFiles = DATA.projects.map((p) => `${p.id}.md`);
+    fs["~/projects"] = { type: "dir", children: projectFiles };
+    DATA.projects.forEach((p) => {
+      fs[`~/projects/${p.id}.md`] = {
+        type: "file",
+        content: [
+          `# ${p.title}`,
+          ...(p.description ? [p.description] : []),
+        ].join("\n"),
+      };
+    });
+
+    // .secret
+    fs["~/.secret"] = {
+      type: "file",
+      content: [
+        "¿Encontraste esto? Mereces un café ☕",
+        "",
+        "  ls -a  era el truco. Siempre lo es.",
+        "",
+        "  Fun fact: esta terminal fue sugerida",
+        "  por una IA que cuestionó su propia",
+        "  razón de existir en el portfolio.",
+        "",
+        "  Irónico.",
+        "",
+        '  $ echo "make something worth reading"',
+      ].join("\n"),
+    };
+
+    return fs;
+  }
+
+  const FS = buildFS();
+
+  // ─── State ─────────────────────────────────────────────────────────────────
+  let cwd = "~";
+  let cmdHistory: string[] = [];
+  let historyIdx = -1;
+  let isOpen = false;
+  let booted = false;
+
+  // ─── DOM refs ───────────────────────────────────────────────────────────────
+  const terminal = document.getElementById("ai-terminal")!;
+  const backdrop = document.getElementById("ai-backdrop")!;
+  const win = document.getElementById("ai-window")!;
+  const output = document.getElementById("ssh-output")!;
+  const form = document.getElementById("ssh-form") as HTMLFormElement;
+  const input = document.getElementById("ssh-input") as HTMLInputElement;
+  const promptLabel = document.getElementById("ssh-prompt")!;
+  const chipsEl = document.getElementById("ssh-chips")!;
+  const closeDot = document.getElementById("ssh-close-dot")!;
+  const closeX = document.getElementById("ssh-close-x")!;
+
+  // ─── Prompt label ───────────────────────────────────────────────────────────
+  function updatePrompt() {
+    const display = cwd === "~" ? "~" : cwd.replace("~/", "~/");
+    promptLabel.textContent = `altaskur@portfolio:${display}$`;
+  }
+
+  // ─── Output rendering ───────────────────────────────────────────────────────
+  type LineType =
+    | "cmd"
+    | "out"
+    | "err"
+    | "dim"
+    | "blank"
+    | "link"
+    | "accent"
+    | "boot";
+
+  function makeLine(
+    text: string,
+    type: LineType = "out",
+    url?: string,
+  ): HTMLElement {
+    const el = document.createElement("div");
+    el.className = "ssh-line leading-relaxed";
+
+    if (type === "blank") {
+      el.innerHTML = "&nbsp;";
+      el.className += " h-3";
+      return el;
+    }
+
+    const colorMap: Record<LineType, string> = {
+      cmd: "text-blue-300",
+      out: "text-blue-200/90",
+      err: "text-red-400",
+      dim: "text-blue-900",
+      link: "text-blue-400 underline underline-offset-2 cursor-pointer hover:text-blue-300 transition-colors",
+      accent: "text-blue-400 font-semibold",
+      boot: "text-blue-500/70",
+      blank: "",
+    };
+    el.className += ` ${colorMap[type]}`;
+
+    if (url) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.textContent = text;
+      a.className = colorMap.link;
+      if (url.startsWith("http")) {
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+      }
+      el.appendChild(a);
+    } else {
+      el.textContent = text;
+    }
+    return el;
+  }
+
+  function appendLines(lines: HTMLElement[], glitch = false) {
+    const frag = document.createDocumentFragment();
+    lines.forEach((l) => frag.appendChild(l));
+    output.appendChild(frag);
+
+    if (glitch) {
+      lines.forEach((l) => l.classList.add("glitching"));
+      setTimeout(
+        () => lines.forEach((l) => l.classList.remove("glitching")),
+        700,
+      );
+    }
+
+    gsap.from(lines, {
+      opacity: 0,
+      y: 6,
+      stagger: 0.035,
+      duration: 0.18,
+      ease: "power2.out",
+    });
+
+    requestAnimationFrame(() => {
+      output.scrollTop = output.scrollHeight;
+    });
+  }
+
+  function shakeOutput() {
+    gsap.to(output, {
+      keyframes: { x: [-4, 4, -3, 3, -1, 1, 0] },
+      duration: 0.35,
+      ease: "none",
+    });
+  }
+
+  // ─── Path resolution ────────────────────────────────────────────────────────
+  function resolvePath(target: string): string {
+    if (target === "..") {
+      if (cwd === "~") return "~";
+      const parts = cwd.split("/");
+      parts.pop();
+      return parts.join("/") || "~";
+    }
+    if (target.startsWith("~")) return target;
+    if (cwd === "~") return `~/${target}`;
+    return `${cwd}/${target}`;
+  }
+
+  // ─── Commands ───────────────────────────────────────────────────────────────
+  const QUICK_CMDS = [
+    "help",
+    "ls",
+    "whoami",
+    "git log",
+    "man isaac",
+    "cat contact.txt",
+  ];
+
+  function runCommand(raw: string) {
+    const cmd = raw.trim();
+    if (!cmd) return;
+
+    cmdHistory.unshift(cmd);
+    historyIdx = -1;
+
+    // Echo command
+    appendLines([makeLine(`${promptLabel.textContent} ${cmd}`, "cmd")]);
+
+    const [verb, ...args] = cmd.split(/\s+/);
+    const arg = args.join(" ");
+
+    switch (verb.toLowerCase()) {
+      case "help":
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine("Comandos disponibles:", "accent"),
+          makeLine("  ls [-a]          listar directorio", "out"),
+          makeLine("  cd <dir>         cambiar directorio", "out"),
+          makeLine("  cat <archivo>    ver contenido", "out"),
+          makeLine("  pwd              directorio actual", "out"),
+          makeLine("  whoami           quién soy", "out"),
+          makeLine("  git log          trayectoria como commits", "out"),
+          makeLine("  man isaac        página del manual", "out"),
+          makeLine("  echo <texto>     repetir texto", "out"),
+          makeLine("  clear            limpiar terminal", "out"),
+          makeLine("  exit             cerrar conexión", "out"),
+          makeLine(" ", "blank"),
+          makeLine("Tip: prueba ls -a para ver archivos ocultos", "dim"),
+          makeLine(" ", "blank"),
+        ]);
+        break;
+
+      case "ls": {
+        const showHidden =
+          args.includes("-a") || args.includes("-la") || args.includes("-al");
+        const node = FS[cwd];
+        if (!node || node.type !== "dir") {
+          appendLines([makeLine(`ls: ${cwd}: no es un directorio`, "err")]);
+          shakeOutput();
+          break;
+        }
+        const children = node.children.filter(
+          (c) => showHidden || !c.startsWith("."),
+        );
+        const lines = [makeLine(" ", "blank")];
+        const row = children.map((c) => {
+          const childPath = cwd === "~" ? `~/${c}` : `${cwd}/${c}`;
+          const childNode = FS[childPath];
+          const isDir = childNode?.type === "dir";
+          return isDir ? `\x1b${c}/` : c; // mark dirs
+        });
+        // Render in columns
+        const cols = row.map((r) => {
+          const isDir = r.startsWith("\x1b");
+          const name = isDir ? r.slice(1) : r;
+          const el = makeLine(name, isDir ? "accent" : "out");
+          if (isDir) el.style.display = "inline-block";
+          el.style.marginRight = "1.5rem";
+          return el;
+        });
+        const rowEl = document.createElement("div");
+        rowEl.className = "flex flex-wrap gap-x-0 gap-y-0.5 py-0.5";
+        cols.forEach((c) => rowEl.appendChild(c));
+        lines.push(rowEl as any);
+        lines.push(makeLine(" ", "blank"));
+        appendLines(lines);
+        break;
+      }
+
+      case "cd": {
+        if (!arg || arg === "~") {
+          cwd = "~";
+          updatePrompt();
+          appendLines([makeLine(" ", "blank")]);
+          break;
+        }
+        const target = resolvePath(arg);
+        if (!FS[target]) {
+          appendLines([makeLine(`cd: ${arg}: no existe`, "err")]);
+          shakeOutput();
+          break;
+        }
+        if (FS[target].type !== "dir") {
+          appendLines([makeLine(`cd: ${arg}: no es un directorio`, "err")]);
+          shakeOutput();
+          break;
+        }
+        cwd = target;
+        updatePrompt();
+        // Brief flash on path update
+        gsap.fromTo(
+          promptLabel,
+          { opacity: 0.3 },
+          { opacity: 1, duration: 0.3 },
+        );
+        appendLines([makeLine(" ", "blank")]);
+        break;
+      }
+
+      case "cat": {
+        if (!arg) {
+          appendLines([makeLine("cat: falta el nombre de archivo", "err")]);
+          shakeOutput();
+          break;
+        }
+        const target = resolvePath(arg);
+        const node = FS[target];
+        if (!node) {
+          appendLines([makeLine(`cat: ${arg}: no existe`, "err")]);
+          shakeOutput();
+          break;
+        }
+        if (node.type === "dir") {
+          appendLines([makeLine(`cat: ${arg}: es un directorio`, "err")]);
+          shakeOutput();
+          break;
+        }
+        const lines: HTMLElement[] = [makeLine(" ", "blank")];
+        node.content.split("\n").forEach((line) => {
+          if (line.startsWith("→") && node.url) {
+            lines.push(
+              makeLine(
+                line,
+                "link",
+                node.url.startsWith("/") ? node.url : undefined,
+              ),
+            );
+          } else if (line.startsWith("→")) {
+            lines.push(
+              makeLine(
+                line,
+                "link",
+                `https://${line.replace("→ ", "").trim()}`,
+              ),
+            );
+          } else if (line.startsWith("#")) {
+            lines.push(makeLine(line, "accent"));
+          } else if (line === "") {
+            lines.push(makeLine(" ", "blank"));
+          } else {
+            lines.push(makeLine(line, "out"));
+          }
+        });
+        lines.push(makeLine(" ", "blank"));
+        appendLines(lines);
+        break;
+      }
+
+      case "pwd":
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine(`/home/altaskur${cwd === "~" ? "" : cwd.slice(1)}`, "out"),
+          makeLine(" ", "blank"),
+        ]);
+        break;
+
+      case "whoami":
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine("Isaac Julián Pavón Ruiz", "accent"),
+          makeLine("Angular Developer · Alicante · remoto", "out"),
+          makeLine("WCAG 2.1/2.2 · Homelab · DevFest 2025", "dim"),
+          makeLine(" ", "blank"),
+        ]);
+        break;
+
+      case "git": {
+        if (arg !== "log" && !args.includes("log")) {
+          appendLines([makeLine(`git: '${arg}' no es un comando git`, "err")]);
+          shakeOutput();
+          break;
+        }
+        const oneline = args.includes("--oneline");
+        const commits = DATA.gitLog;
+        const lines: HTMLElement[] = [makeLine(" ", "blank")];
+        commits.forEach((c, i) => {
+          if (oneline) {
+            lines.push(
+              makeLine(`${c.hash}  ${c.msg}`, i === 0 ? "accent" : "out"),
+            );
+          } else {
+            lines.push(
+              makeLine(`commit ${c.hash} ${c.ref}`, i === 0 ? "accent" : "dim"),
+            );
+            lines.push(
+              makeLine(`Author: Isaac Julián <altaskur@gmail.com>`, "dim"),
+            );
+            lines.push(makeLine(`Date:   ${c.date}`, "dim"));
+            lines.push(makeLine(" ", "blank"));
+            lines.push(makeLine(`    ${c.msg}`, "out"));
+            if (c.sub) lines.push(makeLine(`    ${c.sub}`, "dim"));
+            lines.push(makeLine(" ", "blank"));
+          }
+        });
+        appendLines(lines, true); // glitch!
+        break;
+      }
+
+      case "man": {
+        if (arg.toLowerCase() !== "isaac") {
+          appendLines([makeLine(`man: no hay entrada para '${arg}'`, "err")]);
+          shakeOutput();
+          break;
+        }
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine(
+            "ISAAC(1)           Portfolio Manual           ISAAC(1)",
+            "dim",
+          ),
+          makeLine(" ", "blank"),
+          makeLine("NOMBRE", "accent"),
+          makeLine(
+            "       isaac — software developer, ponente, homelab nerd",
+            "out",
+          ),
+          makeLine(" ", "blank"),
+          makeLine("SINOPSIS", "accent"),
+          makeLine(
+            "       isaac [--angular] [--a11y] [--remoto] [--homelab]",
+            "out",
+          ),
+          makeLine(" ", "blank"),
+          makeLine("DESCRIPCIÓN", "accent"),
+          makeLine(
+            "       Angular developer con foco en accesibilidad WCAG,",
+            "out",
+          ),
+          makeLine(
+            "       SSR y arquitecturas enterprise. 100% remoto.",
+            "out",
+          ),
+          makeLine(" ", "blank"),
+          makeLine("OPCIONES", "accent"),
+          makeLine(
+            "       --angular    versiones 18-21, Signals, NgRx, RxJS",
+            "out",
+          ),
+          makeLine(
+            "       --a11y       WCAG 2.1/2.2 en producción de verdad",
+            "out",
+          ),
+          makeLine("       --remoto     preferente. serio.", "out"),
+          makeLine(
+            "       --homelab    Docker, Forgejo, HA, Ollama, RTX 4070 Ti",
+            "out",
+          ),
+          makeLine(" ", "blank"),
+          makeLine("ESTADO DE SALIDA", "accent"),
+          makeLine("       Devuelve 0 (éxito). Siempre.", "out"),
+          makeLine(" ", "blank"),
+          makeLine("VER TAMBIÉN", "accent"),
+          makeLine(
+            "       github(1), linkedin(1), dev.to(1), cat(1) contact.txt",
+            "out",
+          ),
+          makeLine(" ", "blank"),
+          makeLine(
+            "ISAAC(1)           altaskur.dev v2.0.1          ISAAC(1)",
+            "dim",
+          ),
+          makeLine(" ", "blank"),
+        ]);
+        break;
+      }
+
+      case "echo":
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine(arg || "", "out"),
+          makeLine(" ", "blank"),
+        ]);
+        break;
+
+      case "clear":
+        output.innerHTML = "";
+        break;
+
+      case "exit":
+      case "quit":
+        appendLines([makeLine("Cerrando conexión...", "dim")]);
+        setTimeout(closeTerminal, 600);
+        break;
+
+      case "sudo":
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine("Permission denied. Nice try.", "err"),
+          makeLine("(y no, tampoco con sudo su)", "dim"),
+          makeLine(" ", "blank"),
+        ]);
+        shakeOutput();
+        break;
+
+      case "rm":
+        if (args.includes("-rf") || args.includes("-r")) {
+          appendLines([
+            makeLine(" ", "blank"),
+            makeLine("rm: operación completada.", "accent"),
+            makeLine("  (No, para nada. El portfolio sigue aquí.)", "dim"),
+            makeLine(
+              "  Hint: prueba algo menos destructivo, como 'man isaac'",
+              "dim",
+            ),
+            makeLine(" ", "blank"),
+          ]);
+        } else {
+          appendLines([makeLine(`rm: ${arg}: sin permisos`, "err")]);
+          shakeOutput();
+        }
+        break;
+
+      case "ssh":
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine("Ya estás conectado. ¿A dónde más quieres ir?", "dim"),
+          makeLine(" ", "blank"),
+        ]);
+        break;
+
+      default:
+        appendLines([
+          makeLine(" ", "blank"),
+          makeLine(`${verb}: comando no encontrado`, "err"),
+          makeLine(`Escribe 'help' para ver los comandos disponibles.`, "dim"),
+          makeLine(" ", "blank"),
+        ]);
+        shakeOutput();
+    }
+
+    output.scrollTop = output.scrollHeight;
+  }
+
+  // ─── Boot sequence ──────────────────────────────────────────────────────────
+  async function bootSequence() {
+    output.innerHTML = "";
+    updatePrompt();
+
+    // Helper: type text char by char into an element
+    function typeInto(
+      el: HTMLElement,
+      text: string,
+      speed = 35,
+    ): Promise<void> {
+      return new Promise((resolve) => {
+        let i = 0;
+        el.textContent = "";
+        const interval = setInterval(() => {
+          el.textContent += text[i++];
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, speed);
+      });
+    }
+
+    // Helper: pause
+    const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    // 1. SSH command line
+    const sshLine = makeLine("", "boot");
+    sshLine.innerHTML = `<span class="text-blue-600">$ </span><span id="boot-type"></span><span class="inline-block w-2 h-3.5 bg-blue-500/80 align-text-bottom ml-px boot-cursor"></span>`;
+    output.appendChild(sshLine);
+    const bootType = document.getElementById("boot-type")!;
+    await typeInto(bootType, "ssh altaskur@portfolio.dev", 42);
+    await pause(250);
+
+    // Remove cursor
+    sshLine.querySelector(".boot-cursor")?.remove();
+
+    await pause(150);
+
+    // 2. Connecting line
+    const connLine = makeLine("Connecting to altaskur@portfolio.dev...", "dim");
+    output.appendChild(connLine);
+    gsap.from(connLine, { opacity: 0, duration: 0.2 });
+    await pause(200);
+
+    // 3. Progress bar
+    const barWrap = document.createElement("div");
+    barWrap.className = "ssh-line flex items-center gap-3 text-blue-700 py-0.5";
+    const barTrack = document.createElement("div");
+    barTrack.className =
+      "flex-1 max-w-xs h-1.5 bg-blue-950 rounded-full overflow-hidden";
+    const barFill = document.createElement("div");
+    barFill.className = "h-full bg-blue-500 rounded-full";
+    barFill.style.width = "0%";
+    barTrack.appendChild(barFill);
+    const barPct = document.createElement("span");
+    barPct.className = "font-mono text-xs text-blue-700 w-8 shrink-0";
+    barPct.textContent = "0%";
+    barWrap.appendChild(barTrack);
+    barWrap.appendChild(barPct);
+    output.appendChild(barWrap);
+
+    await new Promise<void>((resolve) => {
+      gsap.to(barFill, {
+        width: "100%",
+        duration: 0.9,
+        ease: "power1.inOut",
+        onUpdate() {
+          const pct = Math.round(this.progress() * 100);
+          barPct.textContent = `${pct}%`;
+        },
+        onComplete: resolve,
+      });
+    });
+
+    await pause(200);
+
+    // 4. Connection established
+    const established = makeLine("Connection established.", "dim");
+    output.appendChild(established);
+    gsap.from(established, { opacity: 0, duration: 0.3 });
+    await pause(400);
+
+    // 5. Welcome banner — tagline aleatoria sobre Isaac, nunca sobre la página
+    const taglines = DATA.identity.taglines;
+    const label = taglines[Math.floor(Math.random() * taglines.length)];
+    const boxWidth = 37;
+    const padded = `  │   ${label}${" ".repeat(Math.max(0, boxWidth - 6 - label.length))}│`;
+
+    const banner = [
+      makeLine(" ", "blank"),
+      makeLine("  ┌─────────────────────────────────────┐", "dim"),
+      makeLine("  │   altaskur@portfolio.dev  v2.0.1   │", "accent"),
+      makeLine(padded, "dim"),
+      makeLine("  └─────────────────────────────────────┘", "dim"),
+      makeLine(" ", "blank"),
+      makeLine("  Escribe 'help' para ver los comandos.", "dim"),
+      makeLine("  Prueba 'ls', 'git log' o 'man isaac'.", "dim"),
+      makeLine(" ", "blank"),
     ];
+    banner.forEach((el) => output.appendChild(el));
+    gsap.from(banner, {
+      opacity: 0,
+      y: 4,
+      stagger: 0.05,
+      duration: 0.25,
+      ease: "power2.out",
+    });
 
-    // Get random response from category
-    function getRandomResponse(category: string): string {
-        const options = responses[category];
-        if (!options || options.length === 0) return defaultResponses[0];
-        return options[Math.floor(Math.random() * options.length)];
+    await pause(300);
+    booted = true;
+    input.focus();
+  }
+
+  // ─── Quick command chips ─────────────────────────────────────────────────────
+  function renderChips() {
+    chipsEl.innerHTML = "";
+    QUICK_CMDS.forEach((cmd) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.textContent = cmd;
+      chip.className =
+        "ssh-chip font-mono text-[11px] px-2.5 py-1 rounded border border-blue-900/60 text-blue-700 hover:border-blue-600 hover:text-blue-400 hover:bg-blue-950/50 transition-all duration-150 cursor-pointer";
+      chip.addEventListener("click", () => {
+        input.value = cmd;
+        input.focus();
+        // micro bounce
+        gsap.fromTo(
+          chip,
+          { scale: 0.9 },
+          { scale: 1, duration: 0.25, ease: "back.out(2)" },
+        );
+      });
+      // Hover lift
+      chip.addEventListener("mouseenter", () =>
+        gsap.to(chip, { y: -2, duration: 0.15 }),
+      );
+      chip.addEventListener("mouseleave", () =>
+        gsap.to(chip, { y: 0, duration: 0.15 }),
+      );
+      chipsEl.appendChild(chip);
+    });
+  }
+
+  // ─── Open / Close ────────────────────────────────────────────────────────────
+  function openTerminal() {
+    if (isOpen) return;
+    isOpen = true;
+    terminal.classList.remove("hidden");
+    terminal.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    if ((window as any).lenis) (window as any).lenis.stop();
+
+    gsap.fromTo(
+      win,
+      { scale: 0.88, opacity: 0, y: 20 },
+      { scale: 1, opacity: 1, y: 0, duration: 0.3, ease: "back.out(1.5)" },
+    );
+    gsap.fromTo(backdrop, { opacity: 0 }, { opacity: 1, duration: 0.25 });
+
+    if (!booted) {
+      renderChips();
+      bootSequence();
+    } else {
+      input.focus();
     }
+  }
 
-    // Find best response
-    function findResponse(message: string): string {
-        const lowerMessage = message.toLowerCase().trim();
-        
-        // Check exact command matches first
-        if (responses[lowerMessage]) {
-            return getRandomResponse(lowerMessage);
-        }
-        
-        // Check keyword matches
-        for (const { keywords, category } of keywordMap) {
-            if (keywords.some(keyword => lowerMessage.includes(keyword))) {
-                return getRandomResponse(category);
-            }
-        }
-        
-        // Return random default response
-        return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
-    }
+  function closeTerminal() {
+    if (!isOpen) return;
+    isOpen = false;
 
-    // Add message to chat
-    function addMessage(role: 'user' | 'assistant', content: string, isTyping = false) {
-        if (!aiMessages) return;
-        
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'ai-message';
-        
-        const prompt = role === 'user' 
-            ? '<span class="text-blue-400 font-mono text-sm">visitor:~$</span>'
-            : '<span class="text-accent font-mono text-sm">ai:~$</span>';
-        
-        msgDiv.innerHTML = `
-            ${prompt}
-            <p class="text-gray-300 mt-1 whitespace-pre-wrap leading-relaxed ${isTyping ? 'ai-typing' : ''}">${content}</p>
-        `;
-        
-        aiMessages.appendChild(msgDiv);
-        scrollToBottom();
-        
-        return msgDiv;
-    }
-
-    // Scroll to bottom of messages
-    function scrollToBottom() {
-        if (aiMessages) {
-            aiMessages.scrollTop = aiMessages.scrollHeight;
-        }
-    }
-
-    // Typewriter effect
-    async function typeMessage(element: HTMLElement, text: string) {
-        element.textContent = '';
-        const chars = text.split('');
-        for (let i = 0; i < chars.length; i++) {
-            element.textContent += chars[i];
-            scrollToBottom();
-            // Faster for punctuation, slower for normal chars
-            const delay = ['.', '!', '?', '\n'].includes(chars[i]) ? 50 : 12;
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-
-    // Clear all messages
-    function clearMessages() {
-        if (aiMessages) {
-            aiMessages.innerHTML = '';
-            showWelcome();
-        }
-    }
-
-    // Show welcome message with commands
-    function showWelcome() {
-        if (!aiMessages) return;
-        
-        aiMessages.innerHTML = `
-            <div class="ai-message">
-                <span class="text-accent font-mono text-sm">system:~$</span>
-                <p class="text-gray-300 mt-1">
-                    👋 Hey! I'm an AI assistant for Isaac's portfolio.
-                </p>
-            </div>
-            <div class="ai-message mt-3">
-                <span class="text-gray-500 font-mono text-sm">Quick commands:</span>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    <button class="cmd-btn" data-cmd="about">about</button>
-                    <button class="cmd-btn" data-cmd="skills">skills</button>
-                    <button class="cmd-btn" data-cmd="projects">projects</button>
-                    <button class="cmd-btn" data-cmd="experience">experience</button>
-                    <button class="cmd-btn" data-cmd="contact">contact</button>
-                    <button class="cmd-btn" data-cmd="stack">stack</button>
-                    <button class="cmd-btn" data-cmd="hobbies">hobbies</button>
-                </div>
-                <p class="text-gray-500 text-xs mt-3">Click a button or type anything to ask!</p>
-            </div>
-        `;
-        
-        // Add click handlers to command buttons
-        document.querySelectorAll('.cmd-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const cmd = (btn as HTMLElement).dataset.cmd;
-                if (cmd) sendMessage(cmd);
-            });
-        });
-    }
-
-    // Open terminal
-    function openTerminal() {
-        if (!aiTerminal || !aiWindow) return;
-        isOpen = true;
-        aiTerminal.classList.remove('hidden');
-        aiTerminal.classList.add('flex');
-        
-        // Block body scroll
-        // Block body scroll
-        document.body.style.overflow = 'hidden';
-        if ((window as any).lenis) (window as any).lenis.stop();
-        
-        // Show welcome if empty
-        if (aiMessages && aiMessages.children.length === 0) {
-            showWelcome();
-        }
-        
-        // Animate in
-        requestAnimationFrame(() => {
-            aiWindow.style.transform = 'scale(1)';
-            aiWindow.style.opacity = '1';
-            aiInput?.focus();
-        });
-    }
-
-    // Close terminal
-    function closeTerminal() {
-        if (!aiTerminal || !aiWindow) return;
-        isOpen = false;
-        
-        // Restore body scroll
-        // Restore body scroll
-        document.body.style.overflow = '';
+    gsap.to(win, {
+      scale: 0.92,
+      opacity: 0,
+      y: 10,
+      duration: 0.2,
+      ease: "power2.in",
+    });
+    gsap.to(backdrop, {
+      opacity: 0,
+      duration: 0.2,
+      onComplete() {
+        terminal.classList.add("hidden");
+        terminal.classList.remove("flex");
+        document.body.style.overflow = "";
         if ((window as any).lenis) (window as any).lenis.start();
-        
-        aiWindow.style.transform = 'scale(0.95)';
-        aiWindow.style.opacity = '0';
-        
-        setTimeout(() => {
-            aiTerminal.classList.add('hidden');
-            aiTerminal.classList.remove('flex');
-        }, 200);
-    }
-
-    // Send message (simulated AI)
-    async function sendMessage(message: string) {
-        if (!message.trim()) return;
-        
-        // Add user message
-        addMessage('user', message);
-        chatHistory.push({ role: 'user', content: message });
-        
-        // Get response
-        const response = findResponse(message);
-        
-        // Handle clear command
-        if (response === '_CLEAR_') {
-            clearMessages();
-            return;
-        }
-        
-        // Add loading indicator
-        const loadingDiv = addMessage('assistant', '▌', true);
-        const loadingP = loadingDiv?.querySelector('p');
-        
-        // Simulate thinking delay
-        await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 400));
-        
-        // Type out response
-        if (loadingP) {
-            await typeMessage(loadingP as HTMLElement, response);
-        }
-        
-        chatHistory.push({ role: 'assistant', content: response });
-    }
-
-    // Event listeners
-    aiCloseBtn?.addEventListener('click', closeTerminal);
-    aiCloseX?.addEventListener('click', closeTerminal);
-    aiBackdrop?.addEventListener('click', closeTerminal);
-    
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isOpen) {
-            closeTerminal();
-        }
+      },
     });
-    
-    aiForm?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const message = aiInput?.value || '';
-        if (aiInput) aiInput.value = '';
-        sendMessage(message);
-    });
+  }
 
-    // Global function to open terminal
-    (window as any).openAITerminal = openTerminal;
-    
-    // Initialize
-    if (aiWindow) {
-        aiWindow.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
+  // ─── Tab completion ──────────────────────────────────────────────────────────
+  function showMatches(matches: string[]) {
+    appendLines([makeLine(`${promptLabel.textContent} ${input.value}`, "cmd")]);
+    const row = document.createElement("div");
+    row.className =
+      "ssh-line flex flex-wrap gap-x-5 gap-y-0.5 text-blue-400/60 py-0.5";
+    matches.forEach((m) => {
+      const span = document.createElement("span");
+      span.textContent = m;
+      row.appendChild(span);
+    });
+    output.appendChild(row);
+    gsap.from(row, { opacity: 0, y: 3, duration: 0.15 });
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function commonPrefix(strs: string[]): string {
+    if (!strs.length) return "";
+    return strs.reduce((acc, s) => {
+      let i = 0;
+      while (i < acc.length && i < s.length && acc[i] === s[i]) i++;
+      return acc.slice(0, i);
+    });
+  }
+
+  function tabComplete(val: string) {
+    const parts = val.split(" ");
+    const verb = parts[0].toLowerCase();
+    const partial = parts.slice(1).join(" ");
+
+    // ── Completar comando ──────────────────────────────────────────
+    if (parts.length === 1) {
+      const cmds = [
+        "ls",
+        "cd",
+        "cat",
+        "pwd",
+        "whoami",
+        "git",
+        "man",
+        "echo",
+        "help",
+        "clear",
+        "exit",
+      ];
+      const matches = cmds.filter((c) => c.startsWith(verb) && c !== verb);
+      if (matches.length === 1) {
+        input.value = matches[0] + " ";
+        gsap.fromTo(input, { opacity: 0.4 }, { opacity: 1, duration: 0.2 });
+      } else if (matches.length > 1) {
+        showMatches(matches);
+        const cp = commonPrefix(matches);
+        if (cp.length > verb.length) input.value = cp;
+      }
+      return;
     }
+
+    // ── git → git log ──────────────────────────────────────────────
+    if (verb === "git") {
+      if ("log".startsWith(partial) && partial !== "log") {
+        input.value = "git log";
+        gsap.fromTo(input, { opacity: 0.4 }, { opacity: 1, duration: 0.2 });
+      }
+      return;
+    }
+
+    // ── man → man isaac ────────────────────────────────────────────
+    if (verb === "man") {
+      if ("isaac".startsWith(partial) && partial !== "isaac") {
+        input.value = "man isaac";
+        gsap.fromTo(input, { opacity: 0.4 }, { opacity: 1, duration: 0.2 });
+      }
+      return;
+    }
+
+    // ── Completar rutas para cd / cat / ls ────────────────────────
+    if (!["cd", "cat", "ls"].includes(verb)) return;
+
+    // Separar directorio base y prefijo final
+    let lookDir = cwd;
+    let prefix = partial;
+    if (partial.includes("/")) {
+      const last = partial.lastIndexOf("/");
+      const base = partial.slice(0, last);
+      prefix = partial.slice(last + 1);
+      lookDir = resolvePath(base);
+    }
+
+    const node = FS[lookDir];
+    if (!node || node.type !== "dir") return;
+
+    let children = node.children.filter((c) => !c.startsWith("."));
+
+    // cd → solo directorios
+    if (verb === "cd")
+      children = children.filter((c) => {
+        const p = lookDir === "~" ? `~/${c}` : `${lookDir}/${c}`;
+        return FS[p]?.type === "dir";
+      });
+
+    // cat → solo ficheros
+    if (verb === "cat")
+      children = children.filter((c) => {
+        const p = lookDir === "~" ? `~/${c}` : `${lookDir}/${c}`;
+        return FS[p]?.type === "file";
+      });
+
+    const matches = children.filter((c) => c.startsWith(prefix));
+    if (!matches.length) return;
+
+    const basePath = partial.includes("/")
+      ? partial.slice(0, partial.lastIndexOf("/") + 1)
+      : "";
+
+    if (matches.length === 1) {
+      const m = matches[0];
+      const mPath = lookDir === "~" ? `~/${m}` : `${lookDir}/${m}`;
+      const slash = FS[mPath]?.type === "dir" ? "/" : "";
+      input.value = `${verb} ${basePath}${m}${slash}`;
+      gsap.fromTo(input, { opacity: 0.4 }, { opacity: 1, duration: 0.2 });
+    } else {
+      showMatches(matches);
+      const cp = commonPrefix(matches);
+      if (cp.length > prefix.length) input.value = `${verb} ${basePath}${cp}`;
+    }
+  }
+
+  // ─── Event listeners ─────────────────────────────────────────────────────────
+  closeDot.addEventListener("click", closeTerminal);
+  closeX.addEventListener("click", closeTerminal);
+  backdrop.addEventListener("click", closeTerminal);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isOpen) closeTerminal();
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const val = input.value.trim();
+    input.value = "";
+    if (val && booted) runCommand(val);
+  });
+
+  // History navigation (up/down)
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      historyIdx = Math.min(historyIdx + 1, cmdHistory.length - 1);
+      input.value = cmdHistory[historyIdx] ?? "";
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      historyIdx = Math.max(historyIdx - 1, -1);
+      input.value = historyIdx >= 0 ? (cmdHistory[historyIdx] ?? "") : "";
+    }
+    // Tab completion
+    if (e.key === "Tab") {
+      e.preventDefault();
+      tabComplete(input.value);
+    }
+  });
+
+  // Foco automático — click en cualquier parte de la terminal va al input
+  win.addEventListener("click", (e) => {
+    if (
+      (e.target as HTMLElement).tagName !== "A" &&
+      (e.target as HTMLElement).tagName !== "BUTTON"
+    ) {
+      input.focus();
+    }
+  });
+
+  // Foco automático — cualquier tecla imprimible con la terminal abierta
+  document.addEventListener("keydown", (e) => {
+    if (!isOpen || !booted) return;
+    if (document.activeElement === input) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key.length === 1) {
+      input.focus();
+      // No hace falta añadir el carácter — el foco solo ya lo captura
+    }
+    if (e.key === "Backspace") input.focus();
+  });
+
+  // Expose global
+  (window as any).openAITerminal = openTerminal;
+
+  // Init transition on window
+  win.style.transition = "box-shadow 0.3s";
 </script>
 
 <style>
-    #ai-messages {
-        scrollbar-width: thin;
-        scrollbar-color: #374151 transparent;
-        overscroll-behavior: contain;
-    }
-    
-    #ai-terminal {
-        overscroll-behavior: contain;
-    }
-    
-    #ai-messages::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    #ai-messages::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    
-    #ai-messages::-webkit-scrollbar-thumb {
-        background: #374151;
-        border-radius: 3px;
-    }
-    
-    #ai-messages::-webkit-scrollbar-thumb:hover {
-        background: #4b5563;
-    }
+  /* ─── Terminal window ─────────────────────────────────── */
+  .terminal-win {
+    background: #020408;
+  }
 
-    .ai-message {
-        animation: fadeIn 0.3s ease-out;
+  .terminal-body {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+    scrollbar-width: thin;
+    scrollbar-color: #1e3a5f transparent;
+  }
+  .terminal-body::-webkit-scrollbar {
+    width: 5px;
+  }
+  .terminal-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .terminal-body::-webkit-scrollbar-thumb {
+    background: #1e3a5f;
+    border-radius: 3px;
+  }
+
+  /* ─── Scanlines ───────────────────────────────────────── */
+  .scanlines {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.12) 3px,
+      rgba(0, 0, 0, 0.12) 4px
+    );
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* ─── Glitch ──────────────────────────────────────────── */
+  @keyframes glitch-a {
+    0% {
+      transform: translate(0);
+      opacity: 1;
     }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    15% {
+      transform: translate(-3px, 1px);
+      clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%);
+      filter: hue-rotate(120deg);
     }
-    
-    .cmd-btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.75rem;
-        font-family: ui-monospace, monospace;
-        border-radius: 0.5rem;
-        border: 1px solid #374151;
-        color: #9ca3af;
-        background: transparent;
-        transition: all 0.2s;
-        cursor: pointer;
+    30% {
+      transform: translate(3px, -1px);
+      clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%);
     }
-    
-    .cmd-btn:hover {
-        border-color: var(--accent, #10b981);
-        color: var(--accent, #10b981);
-        background: rgba(16, 185, 129, 0.1);
+    50% {
+      transform: translate(-2px, 2px);
+      filter: hue-rotate(-60deg);
     }
-    
-    .ai-typing p {
-        animation: blink 0.5s infinite;
+    70% {
+      transform: translate(2px, -1px);
     }
-    
-    @keyframes blink {
-        50% { opacity: 0.5; }
+    85% {
+      transform: translate(-1px, 1px);
+      clip-path: none;
     }
+    100% {
+      transform: translate(0);
+      opacity: 1;
+      filter: none;
+      clip-path: none;
+    }
+  }
+
+  .glitching {
+    animation: glitch-a 0.12s steps(2, jump-none) 4 alternate;
+  }
+
+  /* ─── Prompt glow ─────────────────────────────────────── */
+  #ssh-prompt {
+    text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+  }
+
+  /* ─── Chips ───────────────────────────────────────────── */
+  .ssh-chip {
+    will-change: transform;
+  }
+
+  /* ─── SSH line ────────────────────────────────────────── */
+  .ssh-line {
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ─── Input caret color ───────────────────────────────── */
+  #ssh-input {
+    caret-color: #60a5fa;
+  }
 </style>

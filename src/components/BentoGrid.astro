@@ -424,6 +424,17 @@ try {
 
   gsap.registerPlugin(ScrollTrigger);
 
+  // Semilla fija para que las celdas no cambien en cada redibujado
+  const contributionSeed = (() => {
+    const cells: number[] = [];
+    let s = 42;
+    for (let i = 0; i < 52 * 7; i++) {
+      s = (s * 1664525 + 1013904223) & 0xffffffff;
+      cells.push((s >>> 0) / 0xffffffff);
+    }
+    return cells;
+  })();
+
   const drawContributionGraph = () => {
     const canvas = document.getElementById('contribution-graph') as HTMLCanvasElement;
     if (!canvas) return;
@@ -432,47 +443,59 @@ try {
     if (!ctx) return;
 
     const accentColor = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-accent').trim() || '#a3e635';
+      .getPropertyValue('--color-accent').trim() || '#3b82f6';
     const emptyColor = 'rgba(31,41,55,0.3)';
 
-    const WEEKS = 52;
-    const DAYS = 7;
-    const GAP = 2;
+    const WEEKS   = 52;
+    const DAYS    = 7;
+    const GAP     = 2;
+    const MAX_CELL = 12; // tamaño máximo de celda — evita deformación en pantallas anchas
 
-    const dpr = window.devicePixelRatio || 1;
+    const dpr      = window.devicePixelRatio || 1;
     const displayW = canvas.offsetWidth;
     const displayH = canvas.offsetHeight || 80;
 
-    canvas.width = displayW * dpr;
+    canvas.width  = displayW * dpr;
     canvas.height = displayH * dpr;
     ctx.scale(dpr, dpr);
 
-    const cellW = (displayW - GAP * (WEEKS - 1)) / WEEKS;
-    const cellH = (displayH - GAP * (DAYS - 1)) / DAYS;
-    const radius = Math.min(cellW, cellH) * 0.2;
+    // Celdas con tamaño máximo — en pantallas anchas se centran
+    const cellW  = Math.min(MAX_CELL, (displayW - GAP * (WEEKS - 1)) / WEEKS);
+    const cellH  = Math.min(MAX_CELL, (displayH - GAP * (DAYS  - 1)) / DAYS);
+    const radius = Math.min(cellW, cellH) * 0.25;
+
+    const totalW  = WEEKS * cellW + GAP * (WEEKS - 1);
+    const totalH  = DAYS  * cellH + GAP * (DAYS  - 1);
+    const offsetX = Math.max(0, (displayW - totalW) / 2);
+    const offsetY = Math.max(0, (displayH - totalH) / 2);
 
     for (let w = 0; w < WEEKS; w++) {
       for (let d = 0; d < DAYS; d++) {
-        const rand = Math.random();
-        const hasActivity = rand > 0.7;
-        const x = w * (cellW + GAP);
-        const y = d * (cellH + GAP);
+        const rand        = contributionSeed[w * DAYS + d];
+        const hasActivity = rand > 0.65;
+        const x = offsetX + w * (cellW + GAP);
+        const y = offsetY + d * (cellH + GAP);
 
         ctx.beginPath();
         ctx.roundRect(x, y, cellW, cellH, radius);
 
         if (hasActivity) {
-          ctx.globalAlpha = rand * 0.7 + 0.3;
-          ctx.fillStyle = accentColor;
+          ctx.globalAlpha = rand * 0.65 + 0.35;
+          ctx.fillStyle   = accentColor;
         } else {
           ctx.globalAlpha = 1;
-          ctx.fillStyle = emptyColor;
+          ctx.fillStyle   = emptyColor;
         }
         ctx.fill();
       }
     }
     ctx.globalAlpha = 1;
   };
+
+  // Redibujar si cambia el tamaño del contenedor
+  const ro = new ResizeObserver(() => drawContributionGraph());
+  const contributionCanvas = document.getElementById('contribution-graph');
+  if (contributionCanvas) ro.observe(contributionCanvas);
 
   const initAnimations = () => {
     const prefersReducedMotion = window.matchMedia(
