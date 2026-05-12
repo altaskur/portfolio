@@ -25,4 +25,16 @@ const lab = defineCollection({
   }),
 });
 
-export const collections = { projects, lab };
+const blog = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.coerce.date(),
+    type: z.enum(["article", "experiment"]),
+    coverImage: z.string().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, lab, blog };

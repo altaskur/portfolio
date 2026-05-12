@@ -4,37 +4,42 @@
 <section id="hero" class="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 py-20 md:px-10">
 	<div class="z-10 w-full max-w-4xl">
 
-		<p class="hero-text-anim font-mono text-sm text-accent tracking-widest mb-4">
-			Isaac Julián Pavón Ruiz · altaskur
-		</p>
-
-		<h1 class="text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-tight">
-			<span class="hero-text-anim inline-block">Software</span>
-			<span class="hero-text-anim inline-block text-accent">Developer</span>
-			<br class="hidden md:block" />
-			<span class="hero-text-anim inline-block">Angular</span>
-			<span class="hero-text-anim inline-block"><span class="text-gray-500">·</span> TypeScript</span>
-			<span class="hero-text-anim inline-block"><span class="text-gray-500">·</span> a11y</span>
+		<h1 id="hero-h1" class="hero-scroll-out text-4xl font-bold tracking-tight text-accent md:text-6xl lg:text-7xl leading-tight mb-2 opacity-0">
+			Altaskur
 		</h1>
 
-		<p class="mt-6 text-lg text-gray-300 font-light leading-relaxed hero-text-anim-secondary max-w-2xl">
-			Dos años llevando aplicaciones Angular a producción en entornos enterprise, trabajando con versiones 18 a 21 con SSR.
-			Accesibilidad web (WCAG 2.1/2.2) e IA aplicada como parte estable del flujo, no como extras.
+		<p id="hero-tagline" class="hero-scroll-out font-mono text-base text-gray-400 mb-3 opacity-0">
+			Frontend Engineer <span class="text-gray-600">·</span> Angular <span class="text-gray-600">·</span> TypeScript <span class="text-gray-600">·</span> Accessibility
 		</p>
 
-		<div class="mt-8 hero-text-anim-secondary border-l-2 border-accent/30 pl-6 space-y-2">
-			<span class="block text-sm font-mono text-gray-500">
-				<span class="text-accent">></span> LOC: Elda, Alicante, ES &nbsp;·&nbsp; remoto preferente
+		<p id="hero-name" class="hero-scroll-out font-mono text-xs text-gray-600 tracking-widest mb-6 opacity-0">
+			Isaac Julián Pavón Ruiz
+		</p>
+
+		<p id="hero-p1" class="hero-scroll-out mt-2 text-lg text-gray-300 font-light leading-relaxed max-w-2xl opacity-0">
+			Llevo aplicaciones Angular a producción en entornos enterprise — desde la arquitectura
+			inicial hasta la iteración con el equipo. SSR, accesibilidad integrada desde el principio,
+			IA integrada en el flujo diario.
+		</p>
+		<p id="hero-p2" class="hero-scroll-out mt-4 text-lg text-gray-300 font-light leading-relaxed max-w-2xl opacity-0">
+			Fuera del trabajo escribo sobre lo que construyo y pruebo — frontend, accesibilidad,
+			tooling, automatización e inferencia local. Y el homelab es donde esas cosas se rompen
+			de verdad.
+		</p>
+
+		<div class="mt-8 border-l-2 border-accent/30 pl-6 space-y-2">
+			<span id="hero-loc" class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0">
+				<span class="text-accent">></span> LOC: Elda, Alicante, ES &nbsp;·&nbsp; remoto
 			</span>
-			<span class="block text-sm font-mono text-gray-500">
-				<span class="text-accent">></span> Ponente DevFest Alicante 2025 &nbsp;·&nbsp; abierto a nuevas oportunidades
+			<span id="hero-devfest" class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0">
+				<span class="text-accent">></span> Ponente DevFest Alicante 2025 &nbsp;·&nbsp; abierto a ofertas
 			</span>
 		</div>
 
 		<!-- CTAs -->
-		<div class="mt-10 flex flex-wrap gap-4 hero-text-anim-secondary">
+		<div id="hero-ctas" class="mt-10 flex flex-wrap gap-4 hero-scroll-out opacity-0">
 			<a
-				href="#dashboard"
+				href="#projects"
 				class="group relative inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-mono font-bold text-black transition-all hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-gray-950"
 			>
 				Ver proyectos
@@ -99,11 +104,25 @@
 
 	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-	if (!prefersReducedMotion) {
-		// Scroll-triggered fade out
-		const textElements = document.querySelectorAll(".hero-text-anim");
-		const secondaryText = document.querySelectorAll(".hero-text-anim-secondary");
+	if (prefersReducedMotion) {
+		document.querySelectorAll(".hero-scroll-out, #hero-loc, #hero-devfest").forEach(el => {
+			(el as HTMLElement).style.opacity = "1";
+		});
+	} else {
+		// ── Entrada: timeline secuencial por elemento ──────────────────
+		const enter = gsap.timeline({ defaults: { ease: "power3.out" } });
 
+		enter
+			.fromTo("#hero-h1",      { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7 })
+			.fromTo("#hero-tagline", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55 }, "-=0.35")
+			.fromTo("#hero-name",    { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.3")
+			.fromTo("#hero-p1",      { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6  }, "-=0.15")
+			.fromTo("#hero-p2",      { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6  }, "-=0.35")
+			.fromTo("#hero-loc",     { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.25")
+			.fromTo("#hero-devfest", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.35")
+			.fromTo("#hero-ctas",    { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.25");
+
+		// ── Salida: fade-out scrub al hacer scroll ──────────────────────
 		const scrollTl = gsap.timeline({
 			scrollTrigger: {
 				trigger: "#hero",
@@ -113,26 +132,19 @@
 			}
 		});
 
-		scrollTl.to(textElements, {
+		scrollTl.to(".hero-scroll-out", {
 			opacity: 0,
 			y: -30,
-			stagger: 0.1,
+			stagger: 0.05,
 			ease: "power1.in"
 		});
-
-		scrollTl.to(secondaryText, {
-			opacity: 0,
-			y: -30,
-			duration: 0.5,
-			ease: "power1.in"
-		}, "<0.5");
 
 		// FAB entrance
 		gsap.from("#fab-ai-trigger", {
 			scale: 0,
 			opacity: 0,
 			duration: 0.5,
-			delay: 0.5,
+			delay: 1.2,
 			ease: "back.out(1.7)"
 		});
 	}

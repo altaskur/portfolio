@@ -277,7 +277,6 @@ try {
         <canvas
           id="contribution-graph"
           class="w-full opacity-50 group-hover:opacity-100 transition-opacity"
-          style="height: 80px;"
           aria-label="Gráfico de contribuciones de GitHub"
           role="img"
         ></canvas>
@@ -442,42 +441,49 @@ try {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const displayW = canvas.offsetWidth;
+    if (displayW === 0) return;
+
     const accentColor = getComputedStyle(document.documentElement)
       .getPropertyValue('--color-accent').trim() || '#3b82f6';
     const emptyColor = 'rgba(31,41,55,0.3)';
 
-    const WEEKS   = 52;
-    const DAYS    = 7;
-    const GAP     = 2;
-    const MAX_CELL = 12; // tamaño máximo de celda — evita deformación en pantallas anchas
+    const isMobile = displayW < 640;
+    const WEEKS    = isMobile ? 26 : 52;
+    const DAYS     = 7;
+    const GAP      = 3;
+    const MAX_CELL = 13;  // evita celdas gigantes en desktop ancho
+    const MIN_CELL = 9;   // mínimo legible en móvil pequeño
 
-    const dpr      = window.devicePixelRatio || 1;
-    const displayW = canvas.offsetWidth;
-    const displayH = canvas.offsetHeight || 80;
+    // Tamaño de celda si rellena el ancho disponible, acotado al rango
+    const naturalCell = (displayW - GAP * (WEEKS - 1)) / WEEKS;
+    const CELL        = Math.min(MAX_CELL, Math.max(MIN_CELL, naturalCell));
 
+    // Alto del canvas = exactamente lo que ocupan las 7 filas cuadradas
+    const canvasH = DAYS * CELL + (DAYS - 1) * GAP;
+    canvas.style.height = `${canvasH}px`;
+
+    const dpr = window.devicePixelRatio || 1;
     canvas.width  = displayW * dpr;
-    canvas.height = displayH * dpr;
+    canvas.height = canvasH * dpr;
     ctx.scale(dpr, dpr);
 
-    // Celdas con tamaño máximo — en pantallas anchas se centran
-    const cellW  = Math.min(MAX_CELL, (displayW - GAP * (WEEKS - 1)) / WEEKS);
-    const cellH  = Math.min(MAX_CELL, (displayH - GAP * (DAYS  - 1)) / DAYS);
-    const radius = Math.min(cellW, cellH) * 0.25;
+    const totalW  = WEEKS * CELL + (WEEKS - 1) * GAP;
+    const offsetX = Math.max(0, (displayW - totalW) / 2); // centrar si hay espacio extra
+    const radius  = CELL * 0.25;
 
-    const totalW  = WEEKS * cellW + GAP * (WEEKS - 1);
-    const totalH  = DAYS  * cellH + GAP * (DAYS  - 1);
-    const offsetX = Math.max(0, (displayW - totalW) / 2);
-    const offsetY = Math.max(0, (displayH - totalH) / 2);
+    // En móvil muestra las últimas 26 semanas (más recientes del array)
+    const seedOffset = isMobile ? (52 - WEEKS) * DAYS : 0;
 
     for (let w = 0; w < WEEKS; w++) {
       for (let d = 0; d < DAYS; d++) {
-        const rand        = contributionSeed[w * DAYS + d];
+        const rand        = contributionSeed[seedOffset + w * DAYS + d] ?? 0;
         const hasActivity = rand > 0.65;
-        const x = offsetX + w * (cellW + GAP);
-        const y = offsetY + d * (cellH + GAP);
+        const x = offsetX + w * (CELL + GAP);
+        const y = d * (CELL + GAP);
 
         ctx.beginPath();
-        ctx.roundRect(x, y, cellW, cellH, radius);
+        ctx.roundRect(x, y, CELL, CELL, radius);
 
         if (hasActivity) {
           ctx.globalAlpha = rand * 0.65 + 0.35;

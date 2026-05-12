@@ -2,7 +2,10 @@
 import { getCollection } from 'astro:content';
 
 const projects = await getCollection('projects');
-const featuredProjects = projects.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()).slice(0, 3);
+const featuredProjects = projects
+  .filter(p => p.id !== 'portfolio-2026')
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 3);
 ---
 
 <section id="projects" class="px-4 py-20 md:px-10">
@@ -24,11 +27,6 @@ const featuredProjects = projects.sort((a, b) => b.data.publishDate.valueOf() - 
                     <h3 class="text-3xl font-bold text-white md:text-4xl">{project.data.title}</h3>
                     <p class="text-lg text-gray-400">{project.data.description}</p>
                     
-                    <div class="prose prose-invert prose-sm text-gray-400 max-w-none">
-                         <!-- Render a snippet or key points manually if needed, or link to full case study -->
-                         <p>Read the full case study for technical details on {project.data.title}.</p>
-                    </div>
-
                     <div class="flex gap-4 pt-4">
                         {project.data.repo && (
                             <a href={project.data.repo} target="_blank" class="text-sm font-bold text-white hover:text-accent transition-colors">

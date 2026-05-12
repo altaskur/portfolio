@@ -1,10 +1,5 @@
 ---
-const stackProfesional = ["Angular 18–21", "TypeScript", "JavaScript", "HTML5", "CSS3 / SCSS", "PrimeNG", "Ionic", "Astro", "SSR"];
-const stackA11y = ["WCAG 2.1 / 2.2", "Lighthouse", "WAVE", "IBM Equal Access", "ARIA", "i18n"];
-const stackIA = ["Claude Code", "GitHub Copilot", "Ollama"];
-const stackBackend = ["Node.js", "Express"];
-const stackTooling = ["Storybook", "ESLint", "Prettier", "Husky", "CommitLint", "Stylelint", "SonarQube", "Azure DevOps", "GitHub Actions"];
-const stackPersonal = ["React", "Vue", "LLMs locales"];
+import { skills, aboutParagraphs } from "../data/site";
 ---
 
 <section id="about" class="px-4 py-20 md:px-10" aria-labelledby="about-heading">
@@ -18,79 +13,63 @@ const stackPersonal = ["React", "Vue", "LLMs locales"];
 
     <div class="grid gap-16 md:grid-cols-2">
 
-        <div class="about-col space-y-6 text-gray-400 leading-relaxed opacity-0 translate-y-10">
-            <p>
-                Soy Software Developer con dos años de experiencia en una consultora tecnológica,
-                llevando aplicaciones Angular a producción en proyectos de largo recorrido.
-                He trabajado con Angular 18, 19, 20 y 21 a lo largo de distintas fases y productos —
-                lo que me da una visión real de cómo evoluciona un ecosistema, no solo una foto fija.
-            </p>
-            <p>
-                La accesibilidad web y la IA aplicada no son cosas que añado al final;
-                forman parte de cómo construyo desde el principio.
-            </p>
-            <p>
-                Fuera del trabajo: escribo en Dev.to sobre lo que aprendo, programo en directo
-                en Twitch y hablo en eventos como el <strong class="text-gray-300 font-medium">DevFest Alicante 2025</strong>,
-                donde copresenté la charla <em>«Accesibilidad en dos tiempos»</em>.
-            </p>
-            <p class="font-mono text-sm text-gray-600">
-                <span class="text-accent">></span> Disponible para oportunidades 100% remoto
-            </p>
+        <div class="about-col space-y-6 text-gray-400 leading-relaxed">
+            {aboutParagraphs.map(p => (
+                <p class="about-item opacity-0 translate-y-10">{p}</p>
+            ))}
         </div>
 
-        <div class="about-col space-y-8 opacity-0 translate-y-10">
+        <div class="about-col space-y-8">
 
-            <div>
-                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">Profesional</p>
+            <div class="about-item opacity-0 translate-y-10">
+                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">Frontend</p>
                 <div class="flex flex-wrap gap-2">
-                    {stackProfesional.map(tag => (
+                    {skills.frontend.map(tag => (
                         <span class="rounded border border-gray-700 bg-gray-900 px-3 py-1 text-xs font-mono text-gray-300">{tag}</span>
                     ))}
                 </div>
             </div>
 
-            <div>
+            <div class="about-item opacity-0 translate-y-10">
                 <p class="text-xs font-mono text-accent uppercase tracking-widest mb-3">Accesibilidad</p>
                 <div class="flex flex-wrap gap-2">
-                    {stackA11y.map(tag => (
+                    {skills.a11y.map(tag => (
                         <span class="rounded border border-accent/30 bg-accent/5 px-3 py-1 text-xs font-mono text-accent/80">{tag}</span>
                     ))}
                 </div>
             </div>
 
-            <div>
+            <div class="about-item opacity-0 translate-y-10">
                 <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">IA aplicada</p>
                 <div class="flex flex-wrap gap-2">
-                    {stackIA.map(tag => (
+                    {skills.ia.map(tag => (
                         <span class="rounded border border-gray-700 bg-gray-900 px-3 py-1 text-xs font-mono text-gray-300">{tag}</span>
                     ))}
                 </div>
             </div>
 
-            <div>
+            <div class="about-item opacity-0 translate-y-10">
                 <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">Backend</p>
                 <div class="flex flex-wrap gap-2">
-                    {stackBackend.map(tag => (
+                    {skills.backend.map(tag => (
                         <span class="rounded border border-gray-700 bg-gray-900 px-3 py-1 text-xs font-mono text-gray-300">{tag}</span>
                     ))}
                 </div>
             </div>
 
-            <div>
-                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">Tooling y DevOps</p>
+            <div class="about-item opacity-0 translate-y-10">
+                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">Tooling</p>
                 <div class="flex flex-wrap gap-2">
-                    {stackTooling.map(tag => (
+                    {skills.tooling.map(tag => (
                         <span class="rounded border border-gray-700 bg-gray-900 px-3 py-1 text-xs font-mono text-gray-300">{tag}</span>
                     ))}
                 </div>
             </div>
 
-            <div>
-                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">Exploración personal</p>
-                <p class="text-[10px] font-mono text-gray-700 mb-3">// fuera del stack profesional</p>
+            <div class="about-item opacity-0 translate-y-10">
+                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">Trabajando con</p>
                 <div class="flex flex-wrap gap-2">
-                    {stackPersonal.map(tag => (
+                    {skills.explorando.map(tag => (
                         <span class="rounded border border-gray-800 bg-gray-900/50 px-3 py-1 text-xs font-mono text-gray-500">{tag}</span>
                     ))}
                 </div>
@@ -109,7 +88,7 @@ const stackPersonal = ["React", "Vue", "LLMs locales"];
     const initAboutAnimations = () => {
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (prefersReducedMotion) {
-            document.querySelectorAll(".about-header, .about-col").forEach(el => {
+            document.querySelectorAll(".about-header, .about-item").forEach(el => {
                 (el as HTMLElement).style.opacity = "1";
                 (el as HTMLElement).style.transform = "none";
             });
@@ -124,23 +103,20 @@ const stackPersonal = ["React", "Vue", "LLMs locales"];
             scrollTrigger: {
                 trigger: "#about",
                 start: "top 80%",
-                end: "top 15%",
-                toggleActions: "play reverse play reverse"
+                toggleActions: "play none none reverse"
             }
         });
 
-        document.querySelectorAll(".about-col").forEach((col, i) => {
-            gsap.to(col, {
+        document.querySelectorAll(".about-item").forEach((el) => {
+            gsap.to(el, {
                 y: 0,
                 opacity: 1,
                 duration: 1,
-                delay: i * 0.15,
                 ease: "power3.out",
                 scrollTrigger: {
-                    trigger: col,
-                    start: "top 80%",
-                    end: "top 10%",
-                    toggleActions: "play reverse play reverse"
+                    trigger: el,
+                    start: "top 82%",
+                    toggleActions: "play none none reverse"
                 }
             });
         });

@@ -19,13 +19,13 @@ const canonicalUrl = new URL(Astro.url.pathname, "https://altaskur.dev").href;
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="Isaac Julián Pavón Ruiz (altaskur) — Software Developer especializado en Angular, TypeScript y accesibilidad web (WCAG 2.1/2.2). Desarrollo con IA aplicada. Ponente en DevFest Alicante 2025. Disponible 100% remoto."
+      content="Frontend engineer especializado en Angular, accesibilidad real y tooling. Construyo cosas que luego tengo que mantener. Remoto."
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="author" content="Isaac Julián Pavón Ruiz (altaskur)" />
     <meta
       name="keywords"
-      content="Software Developer, Angular Developer, TypeScript, Web Accessibility, WCAG, a11y, SSR, Astro, Ionic, Software Developer remoto España, AI-assisted development, DevFest Alicante, Angular 19, Angular 20, Angular 21"
+      content="Frontend Engineer, Angular Developer, TypeScript, Web Accessibility, WCAG, a11y, SSR, Astro, Ionic, Frontend Engineer remoto España, AI-assisted development, DevFest Alicante, Angular 19, Angular 20, Angular 21"
     />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png" />
@@ -38,7 +38,7 @@ const canonicalUrl = new URL(Astro.url.pathname, "https://altaskur.dev").href;
     <meta property="og:title" content={title} />
     <meta
       property="og:description"
-      content="Software Developer especializado en Angular, TypeScript y accesibilidad web. Disponible 100% remoto."
+      content="Frontend engineer especializado en Angular, accesibilidad real y tooling. Construyo cosas que luego tengo que mantener. Remoto."
     />
     <meta property="og:image" content="https://altaskur.dev/favicon-192.png" />
     <meta property="og:locale" content="es_ES" />
@@ -49,11 +49,17 @@ const canonicalUrl = new URL(Astro.url.pathname, "https://altaskur.dev").href;
     <meta name="twitter:title" content={title} />
     <meta
       name="twitter:description"
-      content="Software Developer especializado en Angular, TypeScript y accesibilidad web. Disponible 100% remoto."
+      content="Frontend engineer especializado en Angular, accesibilidad real y tooling. Construyo cosas que luego tengo que mantener. Remoto."
     />
     <meta name="twitter:image" content="https://altaskur.dev/favicon-192.png" />
 
     <title>{title}</title>
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="altaskur — blog"
+      href="/rss.xml"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
