@@ -1,15 +1,19 @@
 /**
- * Fuente de verdad para la terminal interactiva del portfolio.
- * Edita este fichero cuando cambie tu situación profesional.
- * El componente AITerminal.astro lo lee en build time.
+ * src/data/terminal.ts — datos exclusivos de la terminal interactiva.
+ *
+ * El grueso del contenido (skills, experience, socials, about, identity)
+ * viene de src/data/site.ts. Aquí solo vive lo específico de la terminal:
+ * el git log narrativo y las taglines del banner de bienvenida.
  */
+
+import { identity, aboutParagraphs, skills, logros, socials } from "./site";
 
 export const terminalData = {
   identity: {
-    handle: "altaskur",
-    name: "Isaac Julián Pavón Ruiz",
-    location: "Alicante, España",
-    // Se muestra en el banner al abrir la terminal — rota aleatoriamente
+    handle:   identity.handle,
+    name:     identity.name,
+    location: identity.location,
+    // Taglines del banner de boot — específicas de la terminal
     taglines: [
       "Angular · WCAG · open source",
       "developer · speaker · remoto",
@@ -18,59 +22,55 @@ export const terminalData = {
     ],
   },
 
+  // about.txt — los mismos párrafos que AboutSection, adaptados a ancho de terminal
   about: [
-    "Isaac Julián Pavón Ruiz — altaskur",
-    "Angular Developer · Alicante, España",
+    `${identity.name} — ${identity.handle}`,
+    `${identity.role} · ${identity.location} · remoto`,
     "",
-    "Dos años llevando apps Angular a producción",
-    "en entornos enterprise, versiones 18 a 21.",
-    "Accesibilidad web WCAG 2.1/2.2 e IA aplicada",
-    "como parte estable del flujo, no como extras.",
-    "Ponente DevFest Alicante 2025.",
-    "Disponible 100% remoto.",
+    ...aboutParagraphs.flatMap((p) => {
+      // Dividir en líneas de ~55 chars en espacios
+      const words = p.split(" ");
+      const lines: string[] = [];
+      let line = "";
+      for (const word of words) {
+        if ((line + " " + word).trimStart().length > 55 && line) {
+          lines.push(line.trimStart());
+          line = word;
+        } else {
+          line = line ? line + " " + word : word;
+        }
+      }
+      if (line) lines.push(line.trimStart());
+      lines.push(""); // línea en blanco entre párrafos
+      return lines;
+    }),
+    `Ponente DevFest Alicante 2025.`,
+    `${identity.status}.`,
   ],
 
-  skills: {
-    core:    ["Angular 18-21", "TypeScript", "RxJS", "NgRx"],
-    "a11y":  ["WCAG 2.1", "WCAG 2.2", "ARIA semántico"],
-    testing: ["Jest", "Testing Library"],
-    tools:   ["Git", "Docker", "Figma", "Vite"],
-    homelab: ["Forgejo", "Home Assistant", "Ollama"],
-    ahora:   ["Signals", "SSR", "IA aplicada"],
-  },
+  // skills.json — mismas categorías que AboutSection
+  skills,
 
+  // contact.txt — derivado de socials + identity
   contact: {
-    github:   "github.com/altaskur",
-    linkedin: "linkedin.com/in/isaac-julián/",
-    devto:    "dev.to/altaskur",
-    email:    "altaskur@gmail.com",
-    web:      "altaskur.dev",
+    github:   socials.find((s) => s.name === "GitHub")!.url.replace("https://", ""),
+    linkedin: socials.find((s) => s.name === "LinkedIn")!.url.replace("https://", ""),
+    devto:    socials.find((s) => s.name === "Dev.to")!.url.replace("https://", ""),
+    bluesky:  socials.find((s) => s.name === "BlueSky")!.url.replace("https://", ""),
+    email:    identity.email,
+    web:      identity.web,
   },
 
-  experience: [
-    {
-      role:    "Angular Developer",
-      period:  "2024 → hoy",
-      bullets: [
-        "Angular 18-21, SSR, Signals, NgRx, RxJS",
-        "Accesibilidad WCAG 2.1/2.2 en producción",
-        "Code reviews · Pair programming · Agile",
-      ],
-    },
-    {
-      role:    "Ponente",
-      period:  "2025",
-      bullets: [
-        "DevFest Alicante 2025",
-        '"IA aplicada al flujo de desarrollo"',
-      ],
-    },
-  ],
+  // experience/cv.txt — los logros del site, agrupados por categoría
+  experience: logros.map((g) => ({
+    role:    g.categoria,
+    period:  "2024 → hoy",
+    bullets: g.items,
+  })),
 
   /**
-   * Tu trayectoria como commits de git.
-   * Añade entradas arriba (más reciente primero) cuando ocurra algo relevante.
-   * hash: cualquier string corto, ref: rama/tag o vacío, date: texto libre.
+   * git log — trayectoria profesional en formato commit.
+   * Añade arriba (más reciente primero) cuando ocurra algo relevante.
    */
   gitLog: [
     {

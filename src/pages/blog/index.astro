@@ -72,9 +72,22 @@ const devtoCount = devtoArticles.length;
         <h1 class="text-3xl font-bold text-white md:text-4xl lg:text-6xl">
           <span class="text-accent">></span> El blog
         </h1>
-        <span class="font-mono text-xs text-gray-600 mt-2 md:mt-4 self-end">
-          {total} entradas
-        </span>
+        <div class="flex items-center gap-3 mt-2 md:mt-4 self-end">
+          <span class="font-mono text-xs text-gray-600">{total} entradas</span>
+          <a
+            href="/rss.xml"
+            title="Suscribirse por RSS"
+            aria-label="Feed RSS del blog"
+            class="inline-flex items-center gap-1.5 font-mono text-xs text-orange-400/60 hover:text-orange-400 transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="6" cy="18" r="2"/>
+              <path d="M6 14a8 8 0 0 1 8 8h2a10 10 0 0 0-10-10v2z"/>
+              <path d="M6 10a12 12 0 0 1 12 12h2A14 14 0 0 0 6 8v2z"/>
+            </svg>
+            RSS
+          </a>
+        </div>
       </div>
       <p class="text-base md:text-xl text-gray-400 max-w-2xl">
         Notas técnicas, experimentos y reflexiones sobre arquitectura frontend,

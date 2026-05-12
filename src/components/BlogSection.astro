@@ -55,10 +55,25 @@ const allArticles = [...localArticles, ...devtoArticles]
         <h2 class="blog-header text-3xl font-bold text-white md:text-4xl opacity-0 translate-y-8">
             <span class="text-accent">05.</span> El blog
         </h2>
-        <a href="/blog"
-           class="hidden font-mono text-sm text-gray-500 hover:text-accent transition-colors md:block">
-            /// ver todos →
-        </a>
+        <div class="hidden md:flex items-center gap-4">
+            <a
+                href="/rss.xml"
+                title="Suscribirse por RSS"
+                aria-label="Feed RSS del blog"
+                class="inline-flex items-center gap-1.5 font-mono text-xs text-orange-400/50 hover:text-orange-400 transition-colors"
+            >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="6" cy="18" r="2"/>
+                    <path d="M6 14a8 8 0 0 1 8 8h2a10 10 0 0 0-10-10v2z"/>
+                    <path d="M6 10a12 12 0 0 1 12 12h2A14 14 0 0 0 6 8v2z"/>
+                </svg>
+                RSS
+            </a>
+            <a href="/blog"
+               class="font-mono text-sm text-gray-500 hover:text-accent transition-colors">
+                /// ver todos →
+            </a>
+        </div>
     </div>
 
     <div class="space-y-16 md:space-y-32">

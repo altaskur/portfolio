@@ -19,8 +19,8 @@ const payload = {
         year: "numeric",
       }),
       type: p.data.type,
-      coverImage: p.data.coverImage ?? null,
     })),
+  devto: [] as { slug: string; title: string; description: string; date: string; tag: string; url: string }[],
   projects: projectPosts.map((p) => ({
     id: p.id.replace(/\.(md|mdx)$/, ""),
     title: p.data.title,
@@ -140,13 +140,8 @@ const payload = {
   const DATA = JSON.parse(
     document.getElementById("t-data")!.textContent!,
   ) as typeof import("../data/terminal").terminalData & {
-    blog: {
-      id: string;
-      title: string;
-      description: string;
-      date: string;
-      type: string;
-    }[];
+    blog: { id: string; title: string; description: string; date: string; type: string }[];
+    devto: { slug: string; title: string; description: string; date: string; tag: string; url: string }[];
     projects: { id: string; title: string; description: string }[];
   };
 
@@ -241,11 +236,14 @@ const payload = {
     expLines.push("  · Desarrollo de Aplicaciones Web");
     fs["~/experience/cv.txt"] = { type: "file", content: expLines.join("\n") };
 
-    // blog/ — desde colección real de Astro
-    const blogFiles = DATA.blog.map((p) => `${p.id}.md`);
-    fs["~/blog"] = { type: "dir", children: blogFiles };
+    // blog/ — igual que la página /blog: altaskur.dev/ + dev.to/
+    fs["~/blog"] = { type: "dir", children: ["altaskur.dev", "dev.to"] };
+
+    // blog/altaskur.dev/ — posts locales de Astro content
+    const localBlogFiles = DATA.blog.map((p) => `${p.id}.md`);
+    fs["~/blog/altaskur.dev"] = { type: "dir", children: localBlogFiles };
     DATA.blog.forEach((p) => {
-      fs[`~/blog/${p.id}.md`] = {
+      fs[`~/blog/altaskur.dev/${p.id}.md`] = {
         type: "file",
         content: [
           `# ${p.title}`,
@@ -258,6 +256,9 @@ const payload = {
         url: `/blog/${p.id}`,
       };
     });
+
+    // blog/dev.to/ — vacío en build time, se rellena en runtime al abrir la terminal
+    fs["~/blog/dev.to"] = { type: "dir", children: [] };
 
     // projects/ — desde colección real de Astro
     const projectFiles = DATA.projects.map((p) => `${p.id}.md`);
@@ -592,8 +593,8 @@ const payload = {
         appendLines([
           makeLine(" ", "blank"),
           makeLine("Isaac Julián Pavón Ruiz", "accent"),
-          makeLine("Angular Developer · Alicante · remoto", "out"),
-          makeLine("WCAG 2.1/2.2 · Homelab · DevFest 2025", "dim"),
+          makeLine("Frontend Engineer · Alicante · remoto", "out"),
+          makeLine("Angular · WCAG 2.1/2.2 · Homelab · DevFest 2025", "dim"),
           makeLine(" ", "blank"),
         ]);
         break;
@@ -765,6 +766,56 @@ const payload = {
     output.scrollTop = output.scrollHeight;
   }
 
+  // ─── Dev.to live fetch ──────────────────────────────────────────────────────
+  async function syncDevto(): Promise<number> {
+    try {
+      const res = await fetch(
+        "https://dev.to/api/articles?username=altaskur&per_page=30",
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (!res.ok) return 0;
+      const articles = await res.json();
+
+      DATA.devto = articles.map((a: any) => ({
+        slug: a.slug,
+        title: a.title,
+        description: a.description || "",
+        date: new Date(a.published_at).toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        tag: a.tag_list?.[0] ?? "artículo",
+        url: a.url,
+      }));
+
+      // Actualizar FS en caliente
+      const devtoDir = FS["~/blog/dev.to"];
+      if (devtoDir && devtoDir.type === "dir") {
+        devtoDir.children = DATA.devto.map((p) => `${p.slug}.md`);
+      }
+      DATA.devto.forEach((p) => {
+        FS[`~/blog/dev.to/${p.slug}.md`] = {
+          type: "file",
+          content: [
+            `# ${p.title}`,
+            `Publicado: ${p.date} · ${p.tag}`,
+            `Fuente: dev.to/altaskur`,
+            "",
+            p.description,
+            "",
+            `→ ${p.url}`,
+          ].join("\n"),
+          url: p.url,
+        };
+      });
+
+      return DATA.devto.length;
+    } catch {
+      return 0; // timeout o red — FS queda vacío, no rompe nada
+    }
+  }
+
   // ─── Boot sequence ──────────────────────────────────────────────────────────
   async function bootSequence() {
     output.innerHTML = "";
@@ -849,7 +900,19 @@ const payload = {
     gsap.from(established, { opacity: 0, duration: 0.3 });
     await pause(400);
 
-    // 5. Welcome banner — tagline aleatoria sobre Isaac, nunca sobre la página
+    // 5. Sync dev.to en paralelo con el banner
+    const syncLine = makeLine("Syncing dev.to/altaskur...", "dim");
+    output.appendChild(syncLine);
+    gsap.from(syncLine, { opacity: 0, duration: 0.2 });
+
+    const syncPromise = syncDevto().then((count) => {
+      syncLine.textContent = count > 0
+        ? `dev.to/altaskur — ${count} artículos sincronizados`
+        : "dev.to/altaskur — sin conexión, modo local";
+      gsap.fromTo(syncLine, { opacity: 0.4 }, { opacity: 1, duration: 0.3 });
+    });
+
+    // 6. Welcome banner — tagline aleatoria sobre Isaac, nunca sobre la página
     const taglines = DATA.identity.taglines;
     const label = taglines[Math.floor(Math.random() * taglines.length)];
     const boxWidth = 37;
@@ -875,7 +938,7 @@ const payload = {
       ease: "power2.out",
     });
 
-    await pause(300);
+    await Promise.all([pause(300), syncPromise]);
     booted = true;
     input.focus();
   }
