@@ -61,17 +61,19 @@ const featuredProjects = projects
     const projects = document.querySelectorAll('.project-card');
 
     projects.forEach((project) => {
-        gsap.to(project, {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: {
-                trigger: project,
-                start: "top 80%",
-                end: "bottom 20%",
-                toggleActions: "play none none reverse"
+        gsap.fromTo(project,
+            { y: 60, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: project,
+                    start: "top 80%",
+                    toggleActions: "play none none reverse"
+                }
             }
-        });
+        );
     });
 </script>

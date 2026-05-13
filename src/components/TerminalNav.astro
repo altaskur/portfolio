@@ -49,14 +49,23 @@ const navItems = [
         <!-- Mobile Navigation (Hidden by default) -->
         <div id="mobile-nav" class="hidden md:hidden px-4 py-3 space-y-1">
             {navItems.map((item) => (
-                <a 
-                    href={item.href} 
+                <a
+                    href={item.href}
                     class="mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-accent hover:bg-gray-800/50 transition-all font-mono text-sm"
                 >
                     <span class="text-accent">{item.label}.</span>
                     <span>cd ~/{item.name}</span>
                 </a>
             ))}
+            <!-- AI Terminal trigger mobile -->
+            <button
+                id="mobile-ai-trigger"
+                class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-accent hover:bg-gray-800/50 transition-all font-mono text-sm border-t border-gray-800/50 mt-1 pt-3"
+            >
+                <span class="text-accent">$</span>
+                <span>altaskur --ask</span>
+                <span class="ml-auto text-[10px] text-accent/60 motion-safe:animate-pulse">IA</span>
+            </button>
         </div>
     </nav>
 </header>
@@ -67,18 +76,31 @@ const navItems = [
 
     gsap.registerPlugin(ScrollTrigger);
 
-    // AI Terminal trigger
+    // AI Terminal trigger (desktop + mobile)
     function setupAITrigger() {
+        const openTerminal = () => {
+            if (typeof (window as any).openAITerminal === 'function') {
+                (window as any).openAITerminal();
+            }
+        };
+
+        // Desktop trigger (barra superior)
         const aiTrigger = document.getElementById('ai-trigger');
         if (aiTrigger) {
-            // Clone to remove existing listeners
             const newTrigger = aiTrigger.cloneNode(true);
             aiTrigger.parentNode?.replaceChild(newTrigger, aiTrigger);
-            
-            newTrigger.addEventListener('click', () => {
-                if (typeof (window as any).openAITerminal === 'function') {
-                    (window as any).openAITerminal();
-                }
+            newTrigger.addEventListener('click', openTerminal);
+        }
+
+        // Mobile trigger (dentro del menú mobile)
+        const mobileAiTrigger = document.getElementById('mobile-ai-trigger');
+        if (mobileAiTrigger) {
+            const newMobileTrigger = mobileAiTrigger.cloneNode(true);
+            mobileAiTrigger.parentNode?.replaceChild(newMobileTrigger, mobileAiTrigger);
+            newMobileTrigger.addEventListener('click', () => {
+                // Cierra el menú mobile antes de abrir la terminal
+                document.getElementById('mobile-nav')?.classList.add('hidden');
+                openTerminal();
             });
         }
     }
