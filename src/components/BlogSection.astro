@@ -191,27 +191,33 @@ gsap.registerPlugin(ScrollTrigger);
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-gsap.to(".blog-header", {
-    opacity: 1,
-    y: 0,
-    duration: prefersReducedMotion ? 0 : 0.8,
-    ease: "power2.out",
-    scrollTrigger: {
-        trigger: "#blog",
-        start: "top 80%",
-    }
-});
-
-gsap.utils.toArray<HTMLElement>(".lab-card").forEach((card) => {
-    gsap.to(card, {
+gsap.fromTo(".blog-header",
+    { opacity: 0, y: 30 },
+    {
         opacity: 1,
         y: 0,
-        duration: prefersReducedMotion ? 0 : 0.9,
+        duration: prefersReducedMotion ? 0 : 0.8,
         ease: "power2.out",
         scrollTrigger: {
-            trigger: card,
-            start: "top 85%",
+            trigger: "#blog",
+            start: "top 80%",
         }
-    });
+    }
+);
+
+gsap.utils.toArray<HTMLElement>(".lab-card").forEach((card) => {
+    gsap.fromTo(card,
+        { opacity: 0, y: 40 },
+        {
+            opacity: 1,
+            y: 0,
+            duration: prefersReducedMotion ? 0 : 0.9,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+            }
+        }
+    );
 });
 </script>

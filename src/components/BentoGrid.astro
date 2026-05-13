@@ -512,18 +512,26 @@ try {
     // Section header
     const dashboardHeader = document.querySelector(".dashboard-header");
     if (dashboardHeader) {
-      gsap.to(dashboardHeader, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: dashboardHeader,
-          start: "top 85%",
-          end: "top 15%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
+      // fromTo con FROM explícito: evita que GSAP capture opacity:0 del CSS
+      // como estado inicial, lo que causaba que la sección quedara invisible
+      // al recargar con scroll en esa zona.
+      // toggleActions "play none none reverse": anima al entrar, revierte al
+      // salir hacia abajo. Sin "reverse" en onLeave, no revierta al hacer
+      // scroll down pasando el end (que causaba el bug de desaparición en reload).
+      gsap.fromTo(dashboardHeader,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: dashboardHeader,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
     }
 
     // GitHub bento cards
@@ -542,8 +550,7 @@ try {
             scrollTrigger: {
               trigger: item,
               start: "top 85%",
-              end: "bottom 15%",
-              toggleActions: "play reverse play reverse",
+              toggleActions: "play none none reverse",
             },
           },
         );
@@ -553,37 +560,41 @@ try {
     // Proyectos destacados — header
     const projectsHeader = document.querySelector(".projects-header");
     if (projectsHeader) {
-      gsap.to(projectsHeader, {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: projectsHeader,
-          start: "top 85%",
-          end: "top 15%",
-          toggleActions: "play reverse play reverse",
-        },
-      });
+      gsap.fromTo(projectsHeader,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: projectsHeader,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      );
     }
 
     // Proyectos destacados — cards
     const projectCards = document.querySelectorAll(".project-card");
     if (projectCards.length > 0) {
       projectCards.forEach((card, index) => {
-        gsap.to(card, {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          delay: index * 0.08,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: card,
-            start: "top 85%",
-            end: "bottom 15%",
-            toggleActions: "play reverse play reverse",
-          },
-        });
+        gsap.fromTo(card,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            delay: index * 0.08,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
       });
     }
   };

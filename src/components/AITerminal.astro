@@ -37,7 +37,7 @@ const payload = {
 
 <div
   id="ai-terminal"
-  class="fixed inset-0 z-[200] hidden items-center justify-center p-3 md:p-8"
+  class="fixed inset-0 z-[200] hidden items-start md:items-center justify-center p-2 md:p-8"
   style="cursor:default"
 >
   <div id="ai-backdrop" class="absolute inset-0 bg-black/85 backdrop-blur-md">
@@ -45,8 +45,8 @@ const payload = {
 
   <div
     id="ai-window"
-    class="relative w-full max-w-2xl rounded-xl border border-gray-700/80 shadow-[0_0_60px_rgba(59,130,246,0.12)] overflow-hidden flex flex-col terminal-win"
-    style="max-height:84vh;cursor:default"
+    class="relative w-full max-w-2xl rounded-xl border border-gray-700/80 shadow-[0_0_60px_rgba(59,130,246,0.12)] overflow-hidden flex flex-col terminal-win mt-14 md:mt-0"
+    style="max-height:88dvh;cursor:default"
   >
     <!-- Scanlines overlay -->
     <div class="scanlines pointer-events-none" aria-hidden="true"></div>
@@ -192,7 +192,6 @@ const payload = {
         "  ─────────────────────",
         `  → ${c.github}`,
         `  → ${c.devto}`,
-        `  → ${c.email}`,
       ].join("\n"),
     };
 
@@ -214,7 +213,6 @@ const payload = {
         `GitHub   → ${c.github}`,
         `LinkedIn → ${c.linkedin}`,
         `Dev.to   → ${c.devto}`,
-        `Mail     → ${c.email}`,
         `Web      → ${c.web}`,
       ].join("\n"),
     };
