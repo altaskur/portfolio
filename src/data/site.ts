@@ -18,7 +18,7 @@ export const identity = {
 
 // ─── Sobre mí — párrafos de AboutSection ─────────────────────────────────────
 export const aboutParagraphs = [
-  "Trabajo con Angular en proyectos de largo recorrido: arquitectura inicial, evolución de versiones, SSR, accesibilidad no cosmética. Lo que me gusta de ese tipo de proyectos es que te obligan a operar lo que construyes, no solo entregarlo.",
+  "Trabajo con Angular en proyectos de largo recorrido: arquitectura inicial, evolución de versiones (18–21), SSR, accesibilidad no cosmética. Lo que me gusta de ese tipo de proyectos es que te obligan a operar lo que construyes — y eso incluye mantener el flujo Figma → implementación → Storybook funcionando a lo largo del tiempo, no solo al arrancar.",
   "Fuera del trabajo mantengo un homelab pequeño — reverse proxy, CI/CD propio, Home Assistant, modelos locales. No para añadirlo al CV, sino porque es la forma más directa de entender cómo funciona la infraestructura que normalmente das por sentada.",
   "La IA la uso como herramienta: copiloto para lo rutinario, revisión manual para lo que importa. Hasta ahora el balance es positivo.",
 ];
