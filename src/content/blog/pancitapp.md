@@ -3,7 +3,7 @@ title: "Pancitapp: de Artifact a React Native pasando por una PWA que se quedó 
 description: "Cómo una psicóloga diseñó la lógica de una app de gestión de recetas en tres días y yo le construí la infraestructura para que durara. Stack, decisiones y lo que aprendí en cada iteración."
 publishDate: 2026-05-15
 type: "article"
-coverImage: /assets/blog/pancitapp-header.svg
+coverImage: /assets/blog/pancitapp-header.webp
 ---
 
 Hace unos días conté que mi pareja diseñó una app en tres días usando Claude. Esto es lo que pasó cuando intenté convertir eso en algo que pudiéramos usar de verdad.
