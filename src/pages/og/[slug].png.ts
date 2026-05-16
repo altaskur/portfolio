@@ -134,17 +134,42 @@ export const GET: APIRoute = async ({ props }) => {
         safeDesc,
       ),
 
-      // Imagen abajo (ancho completo)
+      // Imagen abajo (ancho completo) con gradiente fade inferior
       ...(hasCover
         ? [
-            h("div", {
-              width: "100%",
-              height: 260,
-              borderRadius: 10,
-              backgroundImage: `url(${coverURL})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center center",
-            }),
+            h(
+              "div",
+              {
+                position: "relative",
+                display: "flex",
+                width: "100%",
+                height: 260,
+                borderRadius: 10,
+                overflow: "hidden",
+              },
+              [
+                // Imagen con posición top para mostrar la parte superior
+                h("div", {
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundImage: `url(${coverURL})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "top center",
+                }),
+                // Gradiente fade: transparente → fondo oscuro
+                h("div", {
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 90,
+                  background: "linear-gradient(to bottom, transparent, #020408)",
+                }),
+              ],
+            ),
           ]
         : []),
 
