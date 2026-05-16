@@ -16,7 +16,7 @@ const featuredProjects = projects
 
     <div class="space-y-32">
         {featuredProjects.map((project, index) => (
-            <article class="project-card relative grid gap-10 md:grid-cols-2 items-center opacity-0 translate-y-20">
+            <article class="project-card relative grid gap-10 md:grid-cols-2 items-center opacity-0 translate-y-20" data-project-title={project.data.title}>
                 <div class={`space-y-6 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
                     <div class="flex items-center gap-4 text-accent font-mono text-sm">
                         <span>0{index + 1}</span>
@@ -59,6 +59,17 @@ const featuredProjects = projects
     gsap.registerPlugin(ScrollTrigger);
 
     const projects = document.querySelectorAll('.project-card');
+
+    // Tempoo: tracking de clicks en proyectos
+    projects.forEach((project) => {
+        const title = (project as HTMLElement).dataset.projectTitle ?? "";
+        project.querySelectorAll<HTMLAnchorElement>("a[target='_blank']").forEach((link) => {
+            const type = link.textContent?.includes("GITHUB") ? "repo" : "demo";
+            link.addEventListener("click", () => {
+                (window as any).tempoo?.track("project_link_clicked", { title, type });
+            });
+        });
+    });
 
     projects.forEach((project) => {
         gsap.fromTo(project,

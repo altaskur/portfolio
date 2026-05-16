@@ -1042,6 +1042,7 @@ const payload = {
   function openTerminal() {
     if (isOpen) return;
     isOpen = true;
+    (window as any).tempoo?.track("terminal_opened", { url: window.location.pathname });
     terminal.classList.remove("hidden");
     terminal.classList.add("flex");
     document.body.style.overflow = "hidden";
