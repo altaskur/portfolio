@@ -59,86 +59,7 @@ export const GET: APIRoute = async ({ props }) => {
   const safeTitle = title.length > maxTitle ? title.slice(0, maxTitle) + "…" : title;
   const safeDesc = description.length > maxDesc ? description.slice(0, maxDesc) + "…" : description;
 
-  // ─── Columna de texto ───────────────────────────────────────────────────────
-  const textCol = h(
-    "div",
-    {
-      display: "flex",
-      flexDirection: "column",
-      flex: hasCover ? "0 0 58%" : "1",
-      paddingRight: hasCover ? 40 : 0,
-    },
-    [
-      // Label superior
-      h(
-        "div",
-        { display: "flex", alignItems: "center", gap: 8, marginBottom: 28 },
-        [
-          h("div", { width: 8, height: 8, borderRadius: 4, backgroundColor: "#3B82F6" }),
-          h("span", { fontSize: 14, color: "#3B82F6", letterSpacing: 2 }, `${identity.web}/blog`),
-        ],
-      ),
-
-      // Badge tipo
-      h(
-        "div",
-        { display: "flex", marginBottom: 18 },
-        h(
-          "span",
-          {
-            fontSize: 12,
-            fontWeight: 700,
-            color: "#3B82F6",
-            backgroundColor: "#1E3A5F",
-            padding: "4px 12px",
-            borderRadius: 6,
-            letterSpacing: 1,
-          },
-          typeLabel.toUpperCase(),
-        ),
-      ),
-
-      // Título
-      h(
-        "div",
-        {
-          fontSize: hasCover ? 38 : 44,
-          fontWeight: 700,
-          color: "#ffffff",
-          lineHeight: 1.2,
-          marginBottom: 20,
-        },
-        safeTitle,
-      ),
-
-      // Descripción
-      h(
-        "div",
-        {
-          fontSize: 18,
-          color: "#9CA3AF",
-          lineHeight: 1.5,
-        },
-        safeDesc,
-      ),
-
-      // Spacer
-      h("div", { flex: 1 }),
-    ],
-  );
-
-  // ─── Columna imagen — URL absoluta, satori la fetcha directamente ────────────
-  const imageCol = hasCover
-    ? h("div", {
-        flex: "0 0 42%",
-        borderRadius: 12,
-        backgroundImage: `url(${coverURL})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      })
-    : null;
-
-  // ─── Layout raíz ───────────────────────────────────────────────────────────
+  // ─── Layout raíz: columna vertical (texto → imagen → footer) ───────────────
   const image = h(
     "div",
     {
@@ -147,7 +68,7 @@ export const GET: APIRoute = async ({ props }) => {
       width: "100%",
       height: "100%",
       backgroundColor: "#020408",
-      padding: "52px 60px",
+      padding: "48px 60px 36px",
       fontFamily: "Inter",
       position: "relative",
     },
@@ -162,20 +83,71 @@ export const GET: APIRoute = async ({ props }) => {
         backgroundColor: "#3B82F6",
       }),
 
-      // Fila principal: texto + imagen
-      {
-        type: "div",
-        props: {
-          style: {
-            display: "flex",
-            flexDirection: "row",
-            flex: 1,
-            gap: 0,
-            marginBottom: 24,
-          },
-          children: hasCover ? [textCol, imageCol!] : [textCol],
+      // Label + badge en fila
+      h(
+        "div",
+        { display: "flex", alignItems: "center", gap: 16, marginBottom: 20 },
+        [
+          h("div", { display: "flex", alignItems: "center", gap: 8 }, [
+            h("div", { width: 8, height: 8, borderRadius: 4, backgroundColor: "#3B82F6" }),
+            h("span", { fontSize: 14, color: "#3B82F6", letterSpacing: 2 }, `${identity.web}/blog`),
+          ]),
+          h(
+            "span",
+            {
+              fontSize: 12,
+              fontWeight: 700,
+              color: "#3B82F6",
+              backgroundColor: "#1E3A5F",
+              padding: "3px 10px",
+              borderRadius: 6,
+              letterSpacing: 1,
+            },
+            typeLabel.toUpperCase(),
+          ),
+        ],
+      ),
+
+      // Título
+      h(
+        "div",
+        {
+          fontSize: 42,
+          fontWeight: 700,
+          color: "#ffffff",
+          lineHeight: 1.2,
+          marginBottom: 14,
         },
-      },
+        safeTitle,
+      ),
+
+      // Descripción
+      h(
+        "div",
+        {
+          fontSize: 18,
+          color: "#9CA3AF",
+          lineHeight: 1.5,
+          marginBottom: hasCover ? 20 : 0,
+        },
+        safeDesc,
+      ),
+
+      // Imagen abajo (ancho completo, altura fija)
+      ...(hasCover
+        ? [
+            h("div", { flex: 1 }),
+            h("div", {
+              width: "100%",
+              height: 180,
+              borderRadius: 10,
+              backgroundImage: `url(${coverURL})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center top",
+              marginBottom: 20,
+            }),
+          ]
+        : [h("div", { flex: 1 })]),
 
       // Footer
       h(
@@ -185,7 +157,7 @@ export const GET: APIRoute = async ({ props }) => {
           alignItems: "center",
           justifyContent: "space-between",
           borderTop: "1px solid #1F2937",
-          paddingTop: 20,
+          paddingTop: 16,
         },
         [
           h("div", { display: "flex", alignItems: "center", gap: 12 }, [
