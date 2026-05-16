@@ -51,16 +51,16 @@ const allArticles = [...localArticles, ...devtoArticles]
 ---
 
 <section id="blog" class="px-4 py-20 md:px-10">
-    <div class="mb-16 flex items-end justify-between">
+    <div class="mb-16 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <h2 class="blog-header text-3xl font-bold text-white md:text-4xl opacity-0 translate-y-8">
             <span class="text-accent">05.</span> El blog
         </h2>
-        <div class="hidden md:flex items-center gap-4">
+        <div class="flex items-center gap-4">
             <a
                 href="/rss.xml"
                 title="Suscribirse por RSS"
                 aria-label="Feed RSS del blog"
-                class="inline-flex items-center gap-1.5 font-mono text-xs text-orange-400/50 hover:text-orange-400 transition-colors"
+                class="rss-link inline-flex items-center gap-1.5 font-mono text-xs text-orange-400/60 hover:text-orange-400 transition-colors"
             >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <circle cx="6" cy="18" r="2"/>
@@ -182,6 +182,12 @@ const allArticles = [...localArticles, ...devtoArticles]
         </a>
     </div>
 </section>
+
+<script>
+  document.querySelector(".rss-link")?.addEventListener("click", () => {
+    (window as any).tempoo?.track("rss_clicked", { from: "blog_section" });
+  });
+</script>
 
 <script>
 import { gsap } from "gsap";

@@ -78,7 +78,7 @@ const devtoCount = devtoArticles.length;
             href="/rss.xml"
             title="Suscribirse por RSS"
             aria-label="Feed RSS del blog"
-            class="inline-flex items-center gap-1.5 font-mono text-xs text-orange-400/60 hover:text-orange-400 transition-colors"
+            class="rss-link inline-flex items-center gap-1.5 font-mono text-xs text-orange-400/60 hover:text-orange-400 transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <circle cx="6" cy="18" r="2"/>
@@ -312,6 +312,11 @@ const devtoCount = devtoArticles.length;
 
   // Initial render
   render();
+
+  // Tempoo: tracking RSS
+  document.querySelector(".rss-link")?.addEventListener("click", () => {
+    (window as any).tempoo?.track("rss_clicked", { from: "blog_index" });
+  });
 
   // Tempoo: tracking de clicks en posts
   cards.forEach((card) => {
