@@ -8,7 +8,7 @@ coverImage: /assets/blog/pancitapp-header.webp
 
 Hace unos días conté que mi pareja diseñó una app en tres días usando Claude. Esto es lo que pasó cuando intenté convertir eso en algo que pudiéramos usar de verdad.
 
-Mi pareja es psicóloga. En tres días, a ratitos, diseñó una app de gestión de recetas y menú semanal usando Claude. No me dijo nada hasta tenerla lista. Me la enseñó ilusionada y tenía razón en estarlo — la lógica estaba bien pensada, el diseño era coherente, las funcionalidades eran exactamente las que necesitábamos.
+Mi pareja es psicóloga. En tres días, a ratitos, diseñó una app de gestión de recetas y menú semanal usando Claude. No me dijo nada hasta tenerla lista. Me la enseñó ilusionada y tenía razón en estarlo la lógica estaba bien pensada, el diseño era coherente, las funcionalidades eran exactamente las que necesitábamos.
 
 El problema era que vivía dentro de un Artifact de Claude. Los datos estaban en el navegador, no había nada compartido, no se podía usar entre dos dispositivos. Un producto bien pensado sin infraestructura.
 
@@ -16,15 +16,15 @@ Decidí que su idea se merecía ser real. Este es el recorrido.
 
 ---
 
-## Qué diseñó ella — y por qué importa antes de hablar de tecnología
+## Qué diseñó ella y por qué importa antes de hablar de tecnología
 
 Antes de entrar en las iteraciones hay que entender qué pensó, porque cada decisión técnica que tomé después sale directamente de su lógica.
 
 Pancitapp planifica el menú semanal de un hogar y lo acompaña durante toda la semana. El lunes planificas los 7 días: comida y cena, con perfiles individuales que conocen las alergias y preferencias de cada persona. A partir del menú la app genera automáticamente la lista de la compra, cruzada con lo que ya tienes en la despensa.
 
-Durante la semana la app vive contigo. Marcas los platos que ya has cocinado, señalas los días que coméis fuera — esos platos se excluyen del análisis nutricional y no contaminan la compra. Si un plato no apetece, pides alternativas y la IA sugiere tres opciones contextualizadas con lo que ya hay en el menú. Al terminar la semana la guardas en el historial y empiezas otra.
+Durante la semana la app vive contigo. Marcas los platos que ya has cocinado, señalas los días que coméis fuera esos platos se excluyen del análisis nutricional y no contaminan la compra. Si un plato no apetece, pides alternativas y la IA sugiere tres opciones contextualizadas con lo que ya hay en el menú. Al terminar la semana la guardas en el historial y empiezas otra.
 
-Las valoraciones cierran el bucle que ella pensó: cada plato se puntúa de 1 a 5 estrellas. No se guardan y se olvidan — son la memoria del hogar. La IA las usa en cada petición para saber qué le gusta y qué evitar. Con el tiempo el asistente deja de sugerir lo que no funciona y refuerza lo que sí.
+Las valoraciones cierran el bucle que ella pensó: cada plato se puntúa de 1 a 5 estrellas. No se guardan y se olvidan son la memoria del hogar. La IA las usa en cada petición para saber qué le gusta y qué evitar. Con el tiempo el asistente deja de sugerir lo que no funciona y refuerza lo que sí.
 
 El detalle que mejor explica que esto no es un proyecto técnico sino una herramienta real es la **regla del tupper**: los lunes y martes al mediodía la app sugiere platos que aguanten recalentados (guisos, legumbres, arroces) y penaliza los que no (fritos, ensaladas, huevos). Porque en nuestro hogar ella trabaja fuera y necesita llevarse la comida. Esa lógica no sale de un tutorial, sale de alguien que sabe exactamente qué problema tiene.
 
@@ -34,17 +34,17 @@ El objetivo que marcó desde el principio, y que condicionó cada decisión de U
 
 ---
 
-## Iteración 1: El Artifact — 3 días
+## Iteración 1: El Artifact 3 días
 
-Aquí es donde ella construyó todo. Un Artifact de Claude es una aplicación web que corre dentro del contexto de la conversación — renderiza UI, guarda estado, funciona. Para prototipar una idea en días es difícil de superar.
+Aquí es donde ella construyó todo. Un Artifact de Claude es una aplicación web que corre dentro del contexto de la conversación renderiza UI, guarda estado, funciona. Para prototipar una idea en días es difícil de superar.
 
 El límite es estructural: cada usuario que abre el enlace ve una instancia vacía. Lo que parece una base de datos es localStorage en un navegador concreto. No hay persistencia real, no hay nada compartido entre dispositivos.
 
-Cuando me lo enseñó ya tenía la lógica completa, el diseño definido y las funcionalidades claras. Mi trabajo fue entender que ese Artifact no era un prototipo descartable — era la especificación funcional más honesta que podía tener. Y construir para que durara.
+Cuando me lo enseñó ya tenía la lógica completa, el diseño definido y las funcionalidades claras. Mi trabajo fue entender que ese Artifact no era un prototipo descartable era la especificación funcional más honesta que podía tener. Y construir para que durara.
 
 ---
 
-## Iteración 2: PWA con React y Vite — una semana
+## Iteración 2: PWA con React y Vite una semana
 
 El primer salto fue mío: una PWA con React y Vite para ver si su idea aguantaba fuera del Artifact y cómo se comportaba en móvil.
 
@@ -68,7 +68,7 @@ Coste mensual: lo que consume la torre en luz. Supabase tier gratuito, Google AI
 
 El store gestiona más de 15 acciones y varios slices independientes: menú, compra, despensa, caducidades, historial, catálogo de recetas, perfiles, todo lo que ella diseñó. Context API con ese volumen implica mucho boilerplate y renders innecesarios. Zustand ofrece un API mínimo, sin providers, con persistencia directa sobre AsyncStorage y selectores que evitan suscripciones al estado completo.
 
-### Persistencia, sincronización y Realtime — dos mecanismos distintos
+### Persistencia, sincronización y Realtime dos mecanismos distintos
 
 Hay dos sistemas de sync con responsabilidades distintas.
 
@@ -86,7 +86,7 @@ No es una contradicción. El homelab es donde vive la app web, el repositorio y 
 
 El caso de uso lo explica mejor que cualquier argumento: ella está en casa y añade algo a la lista de la compra. Yo estoy en el súper y lo veo al momento, sin que nadie tenga que encender una VPN. Para una app de uso diario es el mínimo que tiene que funcionar. Pragmatismo al 100%. 
 
-Decidimos que el código no estuviera público, no de forma deliberada, sino porque nunca fue la intención, la idea era tener una herramienta doméstica, no un proyecto de código abierto o de portfolio. El repositorio es privado, el runner de CI/CD corre en otro server junto a la generación APK  es localm y se descarga directamente desde Forgejo. No hay nada en la nube que no sea Supabase, y Supabase solo almacena los datos necesarios para que la app funcione.
+Decidimos que el código no estuviera público, no de forma deliberada, sino porque nunca fue la intención, la idea era tener una herramienta doméstica, no un proyecto de código abierto o de portfolio. El repositorio es privado, el runner de CI/CD corre en otro server junto a la generación APK es localm y se descarga directamente desde Forgejo. No hay nada en la nube que no sea Supabase, y Supabase solo almacena los datos necesarios para que la app funcione.
 
 ### El onboarding y el trigger que lo une todo
 
@@ -114,7 +114,7 @@ A nivel técnico puro no hubo un punto especialmente complejo, lo difícil fue t
 
 Odio depender de servicios de terceros cuando el proyecto no lo necesita. El precio de esa decisión fue tiempo. Lo volvería a pagar.
 
-El runner corre en una torre con i5 de 13ª, 32GB de RAM y una RTX 5070 Ti con 16GB de VRAM — la misma máquina que usamos para modelos de IA local. La APK la generamos nosotros y la descargamos directamente desde Forgejo, sin pasar por ninguna tienda.
+El runner corre en una torre con i5 de 13ª, 32GB de RAM y una RTX 5070 Ti con 16GB de VRAM la misma máquina que usamos para modelos de IA local. La APK la generamos nosotros y la descargamos directamente desde Forgejo, sin pasar por ninguna tienda.
 
 ### Infraestructura
 
