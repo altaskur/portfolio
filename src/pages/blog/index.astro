@@ -140,6 +140,7 @@ const devtoCount = devtoArticles.length;
           return (
             <article
               data-source={post.source}
+              data-post-title={post.title}
               class="post-card group relative flex flex-col sm:flex-row gap-4 p-4 md:p-5 rounded-xl border border-gray-900 bg-gray-900/20 hover:border-gray-700 hover:bg-gray-900/40 transition-all duration-200"
             >
               {/* Imagen — solo si existe */}
@@ -311,6 +312,17 @@ const devtoCount = devtoArticles.length;
 
   // Initial render
   render();
+
+  // Tempoo: tracking de clicks en posts
+  cards.forEach((card) => {
+    const title = card.dataset.postTitle ?? "";
+    const source = card.dataset.source ?? "";
+    card.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        (window as any).tempoo?.track("blog_post_clicked", { title, source });
+      });
+    });
+  });
 </script>
 
 <style>

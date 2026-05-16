@@ -208,7 +208,7 @@ const coverImage = post.data.coverImage ?? null;
                         {...(rp.source === "devto"
                           ? { target: "_blank", rel: "noopener noreferrer" }
                           : {})}
-                        class="group flex flex-col gap-2 bg-gray-900/50 border border-gray-800 rounded-lg p-4 no-underline hover:border-gray-700 transition-colors"
+                        class="related-post-link group flex flex-col gap-2 bg-gray-900/50 border border-gray-800 rounded-lg p-4 no-underline hover:border-gray-700 transition-colors"
                       >
                         <span
                           class={`inline-flex items-center gap-1.5 text-[10px] font-mono font-semibold ${rp.source === "local" ? "text-accent" : "text-indigo-400"}`}
@@ -216,7 +216,7 @@ const coverImage = post.data.coverImage ?? null;
                           <span class="w-1 h-1 rounded-full bg-current" />
                           {rp.source === "local" ? "altaskur.dev" : "dev.to"}
                         </span>
-                        <p class="text-sm font-medium text-gray-200 leading-snug group-hover:text-accent transition-colors">
+                        <p class="related-post-title text-sm font-medium text-gray-200 leading-snug group-hover:text-accent transition-colors">
                           {rp.title}
                         </p>
                         <p class="text-[10px] font-mono text-gray-600">
@@ -266,6 +266,17 @@ const coverImage = post.data.coverImage ?? null;
 </Layout>
 
 <script>
+  // Tempoo: tracking de clicks en posts relacionados
+  document.querySelectorAll<HTMLAnchorElement>(".related-post-link").forEach((link) => {
+    link.addEventListener("click", () => {
+      (window as any).tempoo?.track("related_post_clicked", {
+        from: window.location.pathname,
+        to: link.getAttribute("href") ?? "",
+        title: link.querySelector(".related-post-title")?.textContent ?? "",
+      });
+    });
+  });
+
   const headings =
     document.querySelectorAll<HTMLHeadingElement>(".prose-blog h2");
   const tocList = document.getElementById("toc-list");
