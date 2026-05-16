@@ -5,7 +5,7 @@
 
 export const identity = {
   handle:   "altaskur",
-  name:     "Isaac Julian Pavon Ruiz",
+  name:     "Isaac Julián Pavón Ruiz",
   role:     "Frontend Engineer",
   location: "Elda, Alicante, ES",
   email:    "altaskur@gmail.com",

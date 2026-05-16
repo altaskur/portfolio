@@ -126,21 +126,20 @@ export const GET: APIRoute = async ({ props }) => {
       h(
         "div",
         {
-          fontSize: 18,
+          fontSize: 16,
           color: "#9CA3AF",
-          lineHeight: 1.5,
-          marginBottom: hasCover ? 20 : 0,
+          lineHeight: 1.6,
+          marginBottom: hasCover ? 24 : 0,
         },
         safeDesc,
       ),
 
-      // Imagen abajo (ancho completo, altura fija)
+      // Imagen abajo (ancho completo, sin spacer flexible)
       ...(hasCover
         ? [
-            h("div", { flex: 1, minHeight: 12 }),
             h("div", {
               width: "100%",
-              height: 200,
+              height: 240,
               borderRadius: 10,
               backgroundImage: `url(${coverURL})`,
               backgroundSize: "cover",
