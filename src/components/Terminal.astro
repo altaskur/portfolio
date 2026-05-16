@@ -8,21 +8,31 @@ const projectPosts = await getCollection("projects");
 
 // Genera el git log dinámicamente: blog posts + charlas + entrada init fija
 const sortedPosts = [...blogPosts].sort(
-  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
 );
 
 const gitLogFromPosts = sortedPosts.map((p, i) => ({
-  hash: p.id.replace(/[^a-z0-9]/gi, "").slice(0, 7).padEnd(7, "0"),
+  hash: p.id
+    .replace(/[^a-z0-9]/gi, "")
+    .slice(0, 7)
+    .padEnd(7, "0"),
   ref: i === 0 ? "(HEAD -> main)" : "",
-  date: p.data.publishDate.toLocaleDateString("es-ES", { month: "short", year: "numeric" }),
+  date: p.data.publishDate.toLocaleDateString("es-ES", {
+    month: "short",
+    year: "numeric",
+  }),
   msg: `post: ${p.data.title}`,
-  sub: p.data.description.length > 55
-    ? p.data.description.slice(0, 55) + "…"
-    : p.data.description,
+  sub:
+    p.data.description.length > 55
+      ? p.data.description.slice(0, 55) + "…"
+      : p.data.description,
 }));
 
 const gitLogFromTalks = talks.map((t) => ({
-  hash: t.event.replace(/[^a-z0-9]/gi, "").slice(0, 7).padEnd(7, "0"),
+  hash: t.event
+    .replace(/[^a-z0-9]/gi, "")
+    .slice(0, 7)
+    .padEnd(7, "0"),
   ref: "",
   date: t.date,
   msg: `talk: ${t.event}`,
@@ -55,7 +65,14 @@ const payload = {
     }),
     type: p.data.type,
   })),
-  devto: [] as { slug: string; title: string; description: string; date: string; tag: string; url: string }[],
+  devto: [] as {
+    slug: string;
+    title: string;
+    description: string;
+    date: string;
+    tag: string;
+    url: string;
+  }[],
   projects: projectPosts.map((p) => ({
     id: p.id.replace(/\.(md|mdx)$/, ""),
     title: p.data.title,
@@ -175,9 +192,23 @@ const payload = {
   const DATA = JSON.parse(
     document.getElementById("t-data")!.textContent!,
   ) as typeof import("../data/terminal").terminalData & {
-    blog: { id: string; title: string; description: string; date: string; type: string }[];
-    devto: { slug: string; title: string; description: string; date: string; tag: string; url: string }[];
+    blog: {
+      id: string;
+      title: string;
+      description: string;
+      date: string;
+      type: string;
+    }[];
+    devto: {
+      slug: string;
+      title: string;
+      description: string;
+      date: string;
+      tag: string;
+      url: string;
+    }[];
     projects: { id: string; title: string; description: string }[];
+    gitLog: { hash: string; ref: string; date: string; msg: string; sub: string }[];
   };
 
   // ─── Filesystem construido desde DATA ──────────────────────────────────────
@@ -939,9 +970,10 @@ const payload = {
     gsap.from(syncLine, { opacity: 0, duration: 0.2 });
 
     const syncPromise = syncDevto().then((count) => {
-      syncLine.textContent = count > 0
-        ? `dev.to/altaskur — ${count} artículos sincronizados`
-        : "dev.to/altaskur — sin conexión, modo local";
+      syncLine.textContent =
+        count > 0
+          ? `dev.to/altaskur — ${count} artículos sincronizados`
+          : "dev.to/altaskur — sin conexión, modo local";
       gsap.fromTo(syncLine, { opacity: 0.4 }, { opacity: 1, duration: 0.3 });
     });
 
@@ -1311,4 +1343,25 @@ const payload = {
     100% {
       transform: translate(0);
       opacity: 1;
-      filter
+      filter: none;
+      clip-path: none;
+    }
+  }
+
+  .glitching {
+    animation: glitch-a 0.12s steps(2, jump-none) 4 alternate;
+  }
+
+  /* Prompt glow */
+  #ssh-prompt {
+    text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+  }
+
+  /* Chips */
+  .ssh-chip {
+    will-change: transform;
+  }
+
+  /* SSH line */
+  .ssh-line {
+   
