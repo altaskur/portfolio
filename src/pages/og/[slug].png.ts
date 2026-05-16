@@ -129,25 +129,27 @@ export const GET: APIRoute = async ({ props }) => {
           fontSize: 16,
           color: "#9CA3AF",
           lineHeight: 1.6,
-          marginBottom: hasCover ? 24 : 0,
+          marginBottom: hasCover ? 20 : 0,
         },
         safeDesc,
       ),
 
-      // Imagen abajo (ancho completo, sin spacer flexible)
+      // Imagen abajo (ancho completo)
       ...(hasCover
         ? [
             h("div", {
               width: "100%",
-              height: 240,
+              height: 260,
               borderRadius: 10,
               backgroundImage: `url(${coverURL})`,
               backgroundSize: "cover",
               backgroundPosition: "center center",
-              marginBottom: 20,
             }),
           ]
-        : [h("div", { flex: 1 })]),
+        : []),
+
+      // Spacer flexible — siempre presente, ancla el footer al fondo
+      h("div", { flex: 1 }),
 
       // Footer
       h(
