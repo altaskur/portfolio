@@ -1,43 +1,76 @@
 ---
+
 ---
 
-<section id="hero" class="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 py-20 md:px-10">
+<section
+	id="hero"
+	class="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 py-20 md:px-10"
+>
 	<div class="z-10 w-full max-w-4xl">
-
-		<h1 id="hero-h1" class="hero-scroll-out text-4xl font-bold tracking-tight text-accent md:text-6xl lg:text-7xl leading-tight mb-2 opacity-0">
+		<h1
+			id="hero-h1"
+			class="hero-scroll-out text-4xl font-bold tracking-tight text-accent md:text-6xl lg:text-7xl leading-tight mb-2 opacity-0"
+		>
 			Altaskur
 		</h1>
 
-		<p id="hero-tagline" class="hero-scroll-out font-mono text-base text-gray-400 mb-3 opacity-0">
-			Frontend Engineer <span class="text-gray-600">·</span> Angular <span class="text-gray-600">·</span> TypeScript <span class="text-gray-600">·</span> Accessibility
+		<p
+			id="hero-tagline"
+			class="hero-scroll-out font-mono text-base text-gray-400 mb-3 opacity-0"
+		>
+			Frontend Engineer <span class="text-gray-600">·</span> Angular <span
+				class="text-gray-600">·</span
+			> TypeScript <span class="text-gray-600">·</span> Accessibility
 		</p>
 
-		<p id="hero-name" class="hero-scroll-out font-mono text-xs text-gray-600 tracking-widest mb-6 opacity-0">
+		<p
+			id="hero-name"
+			class="hero-scroll-out font-mono text-xs text-gray-600 tracking-widest mb-6 opacity-0"
+		>
 			Isaac Julián Pavón Ruiz
 		</p>
 
-		<p id="hero-p1" class="hero-scroll-out mt-2 text-lg text-gray-300 font-light leading-relaxed max-w-2xl opacity-0">
-			Llevo aplicaciones Angular a producción en entornos enterprise — arquitectura inicial,
-			evolución entre versiones (18–21), SSR y accesibilidad integrada desde el principio.
-			El flujo Figma → componente documentado en Storybook es parte del trabajo, no un extra.
+		<p
+			id="hero-p1"
+			class="hero-scroll-out mt-2 text-lg text-gray-300 font-light leading-relaxed max-w-2xl opacity-0"
+		>
+			Llevo aplicaciones Angular a producción en entornos enterprise
+			arquitectura inicial, evolución entre versiones (18–21), SSR y
+			accesibilidad integrada desde el principio.
+			<br />
+			El flujo Figma componente documentado en Storybook es parte del trabajo.
 		</p>
-		<p id="hero-p2" class="hero-scroll-out mt-4 text-lg text-gray-300 font-light leading-relaxed max-w-2xl opacity-0">
-			Fuera del trabajo escribo sobre lo que construyo y pruebo — frontend, accesibilidad,
-			tooling, automatización e inferencia local. Y el homelab es donde esas cosas se rompen
-			de verdad.
+		<p
+			id="hero-p2"
+			class="hero-scroll-out mt-4 text-lg text-gray-300 font-light leading-relaxed max-w-2xl opacity-0"
+		>
+			Fuera del trabajo escribo sobre lo que construyo y pruebo: frontend,
+			accesibilidad, tooling, automatización e inferencia local. Y el
+			homelab es donde esas cosas se rompen de verdad.
 		</p>
 
 		<div class="mt-8 border-l-2 border-accent/30 pl-6 space-y-2">
-			<span id="hero-loc" class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0">
-				<span class="text-accent">></span> LOC: Elda, Alicante, ES &nbsp;·&nbsp; remoto
+			<span
+				id="hero-loc"
+				class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0"
+			>
+				<span class="text-accent">></span> LOC: Elda, Alicante, ES &nbsp;·&nbsp;
+				remoto
 			</span>
-			<span id="hero-devfest" class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0">
-				<span class="text-accent">></span> Ponente DevFest Alicante 2025 &nbsp;·&nbsp; abierto a ofertas
+			<span
+				id="hero-devfest"
+				class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0"
+			>
+				<span class="text-accent">></span> Ponente DevFest Alicante 2025 &nbsp;·&nbsp;
+				abierto a ofertas
 			</span>
 		</div>
 
 		<!-- CTAs -->
-		<div id="hero-ctas" class="mt-10 flex flex-wrap gap-4 hero-scroll-out opacity-0">
+		<div
+			id="hero-ctas"
+			class="mt-10 flex flex-wrap gap-4 hero-scroll-out opacity-0"
+		>
 			<a
 				href="#projects"
 				class="group relative inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-mono font-bold text-black transition-all hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-gray-950"
@@ -51,32 +84,63 @@
 				Contactar
 			</a>
 		</div>
-
 	</div>
 
 	<!-- Scroll Indicator -->
-	<div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-center hero-text-anim-secondary">
-		<span class="block text-xs font-mono text-gray-400">
-			↓ Explorar
-		</span>
+	<div
+		class="absolute bottom-10 left-1/2 -translate-x-1/2 text-center hero-text-anim-secondary"
+	>
+		<span class="block text-xs font-mono text-gray-400"> ↓ Explorar </span>
 	</div>
 
 	<!-- Playground Panel (oculto, accesible por atajo de teclado) -->
-	<div id="playground-panel" class="fixed right-4 top-20 z-50 hidden w-64 rounded-xl border border-gray-800 bg-gray-900/90 p-4 shadow-2xl backdrop-blur-md">
-		<h2 class="mb-4 text-xs font-mono font-bold uppercase tracking-wider text-gray-500">System Controls</h2>
+	<div
+		id="playground-panel"
+		class="fixed right-4 top-20 z-50 hidden w-64 rounded-xl border border-gray-800 bg-gray-900/90 p-4 shadow-2xl backdrop-blur-md"
+	>
+		<h2
+			class="mb-4 text-xs font-mono font-bold uppercase tracking-wider text-gray-500"
+		>
+			System Controls
+		</h2>
 		<div class="space-y-4">
 			<div>
-				<label class="mb-2 block text-xs text-gray-400">Accent Color</label>
+				<label class="mb-2 block text-xs text-gray-400"
+					>Accent Color</label
+				>
 				<div class="flex gap-2">
-					<button class="h-6 w-6 rounded-full bg-blue-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#3B82F6" aria-label="Color azul"></button>
-					<button class="h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#10B981" aria-label="Color verde"></button>
-					<button class="h-6 w-6 rounded-full bg-purple-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#8B5CF6" aria-label="Color morado"></button>
-					<button class="h-6 w-6 rounded-full bg-orange-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn" data-color="#F97316" aria-label="Color naranja"></button>
+					<button
+						class="h-6 w-6 rounded-full bg-blue-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn"
+						data-color="#3B82F6"
+						aria-label="Color azul"></button>
+					<button
+						class="h-6 w-6 rounded-full bg-emerald-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn"
+						data-color="#10B981"
+						aria-label="Color verde"></button>
+					<button
+						class="h-6 w-6 rounded-full bg-purple-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn"
+						data-color="#8B5CF6"
+						aria-label="Color morado"></button>
+					<button
+						class="h-6 w-6 rounded-full bg-orange-500 ring-2 ring-transparent ring-offset-2 ring-offset-gray-900 transition-all hover:ring-white color-btn"
+						data-color="#F97316"
+						aria-label="Color naranja"></button>
 				</div>
 			</div>
 			<div>
-				<label class="mb-2 block text-xs text-gray-400">Grid Intensity</label>
-				<input type="range" min="0" max="0.5" step="0.05" value="0.2" class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-accent" id="grid-intensity" aria-label="Intensidad de la cuadrícula">
+				<label class="mb-2 block text-xs text-gray-400"
+					>Grid Intensity</label
+				>
+				<input
+					type="range"
+					min="0"
+					max="0.5"
+					step="0.05"
+					value="0.2"
+					class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-accent"
+					id="grid-intensity"
+					aria-label="Intensidad de la cuadrícula"
+				/>
 			</div>
 		</div>
 	</div>
@@ -87,12 +151,29 @@
 		class="fixed bottom-6 right-6 z-[90] flex h-14 w-14 items-center justify-center rounded-full bg-accent text-black shadow-lg shadow-accent/20 transition-all hover:scale-110 hover:shadow-accent/40 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 group"
 		aria-label="Abrir terminal"
 	>
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:rotate-12" aria-hidden="true">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			class="transition-transform group-hover:rotate-12"
+			aria-hidden="true"
+		>
 			<polyline points="4 17 10 11 4 5"></polyline>
 			<line x1="12" y1="19" x2="20" y2="19"></line>
 		</svg>
-		<span class="absolute -top-1 -right-1 h-3 w-3 motion-safe:animate-ping rounded-full bg-white opacity-75" style="animation-iteration-count:3" aria-hidden="true"></span>
-		<span class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-white" aria-hidden="true"></span>
+		<span
+			class="absolute -top-1 -right-1 h-3 w-3 motion-safe:animate-ping rounded-full bg-white opacity-75"
+			style="animation-iteration-count:3"
+			aria-hidden="true"></span>
+		<span
+			class="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-white"
+			aria-hidden="true"></span>
 	</button>
 </section>
 
@@ -102,12 +183,16 @@
 
 	gsap.registerPlugin(ScrollTrigger);
 
-	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const prefersReducedMotion = window.matchMedia(
+		"(prefers-reduced-motion: reduce)",
+	).matches;
 
 	if (prefersReducedMotion) {
-		document.querySelectorAll(".hero-scroll-out, #hero-loc, #hero-devfest").forEach(el => {
-			(el as HTMLElement).style.opacity = "1";
-		});
+		document
+			.querySelectorAll(".hero-scroll-out, #hero-loc, #hero-devfest")
+			.forEach((el) => {
+				(el as HTMLElement).style.opacity = "1";
+			});
 	} else {
 		// ── Salida: fade-out scrub al hacer scroll ──────────────────────
 		// IMPORTANTE: se registra ANTES que la entrada para que el scrub
@@ -127,17 +212,18 @@
 				end: "bottom top",
 				scrub: 1,
 				invalidateOnRefresh: true,
-			}
+			},
 		});
 
-		scrollTl.fromTo(".hero-scroll-out",
-			{ opacity: 1, y: 0 },     // FROM explícito: texto visible
+		scrollTl.fromTo(
+			".hero-scroll-out",
+			{ opacity: 1, y: 0 }, // FROM explícito: texto visible
 			{
 				opacity: 0,
 				y: -30,
 				stagger: 0.05,
 				ease: "power1.in",
-			}
+			},
 		);
 
 		// ── Entrada: solo si cargamos desde el top ─────────────────────
@@ -148,19 +234,61 @@
 		// lanzando la entrada incluso cuando se carga en #social.
 		// Revisar el hash es más fiable: si hay hash ≠ vacío, se carga
 		// en una sección concreta → no hay que mostrar la entrada del hero.
-		const hasDeepLink = window.location.hash && window.location.hash !== '' && window.location.hash !== '#';
+		const hasDeepLink =
+			window.location.hash &&
+			window.location.hash !== "" &&
+			window.location.hash !== "#";
 		if (!hasDeepLink && window.scrollY < 50) {
 			const enter = gsap.timeline({ defaults: { ease: "power3.out" } });
 
 			enter
-				.fromTo("#hero-h1",      { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7 })
-				.fromTo("#hero-tagline", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55 }, "-=0.35")
-				.fromTo("#hero-name",    { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.3")
-				.fromTo("#hero-p1",      { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6  }, "-=0.15")
-				.fromTo("#hero-p2",      { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6  }, "-=0.35")
-				.fromTo("#hero-loc",     { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.25")
-				.fromTo("#hero-devfest", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.35")
-				.fromTo("#hero-ctas",    { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45 }, "-=0.25");
+				.fromTo(
+					"#hero-h1",
+					{ opacity: 0, y: 40 },
+					{ opacity: 1, y: 0, duration: 0.7 },
+				)
+				.fromTo(
+					"#hero-tagline",
+					{ opacity: 0, y: 20 },
+					{ opacity: 1, y: 0, duration: 0.55 },
+					"-=0.35",
+				)
+				.fromTo(
+					"#hero-name",
+					{ opacity: 0, y: 15 },
+					{ opacity: 1, y: 0, duration: 0.45 },
+					"-=0.3",
+				)
+				.fromTo(
+					"#hero-p1",
+					{ opacity: 0, y: 20 },
+					{ opacity: 1, y: 0, duration: 0.6 },
+					"-=0.15",
+				)
+				.fromTo(
+					"#hero-p2",
+					{ opacity: 0, y: 20 },
+					{ opacity: 1, y: 0, duration: 0.6 },
+					"-=0.35",
+				)
+				.fromTo(
+					"#hero-loc",
+					{ opacity: 0, y: 12 },
+					{ opacity: 1, y: 0, duration: 0.45 },
+					"-=0.25",
+				)
+				.fromTo(
+					"#hero-devfest",
+					{ opacity: 0, y: 12 },
+					{ opacity: 1, y: 0, duration: 0.45 },
+					"-=0.35",
+				)
+				.fromTo(
+					"#hero-ctas",
+					{ opacity: 0, y: 12 },
+					{ opacity: 1, y: 0, duration: 0.45 },
+					"-=0.25",
+				);
 
 			// FAB entrance solo en carga desde top
 			gsap.from("#fab-ai-trigger", {
@@ -168,7 +296,7 @@
 				opacity: 0,
 				duration: 0.5,
 				delay: 1.2,
-				ease: "back.out(1.7)"
+				ease: "back.out(1.7)",
 			});
 		} else {
 			// Deep-link o reload con scroll: FAB directamente visible
@@ -178,8 +306,10 @@
 		// ── Mobile: re-calcular triggers si cambia el viewport (URL bar) ─
 		if (window.visualViewport) {
 			let lastVpHeight = window.visualViewport.height;
-			window.visualViewport.addEventListener('resize', () => {
-				if (Math.abs(window.visualViewport!.height - lastVpHeight) > 50) {
+			window.visualViewport.addEventListener("resize", () => {
+				if (
+					Math.abs(window.visualViewport!.height - lastVpHeight) > 50
+				) {
 					lastVpHeight = window.visualViewport!.height;
 					ScrollTrigger.refresh();
 				}
@@ -189,10 +319,12 @@
 
 	// AI Terminal trigger
 	const triggerAI = () => {
-		if (typeof (window as any).openTerminal === 'function') {
+		if (typeof (window as any).openTerminal === "function") {
 			(window as any).openTerminal();
 		}
 	};
 
-	document.getElementById('fab-ai-trigger')?.addEventListener('click', triggerAI);
+	document
+		.getElementById("fab-ai-trigger")
+		?.addEventListener("click", triggerAI);
 </script>
