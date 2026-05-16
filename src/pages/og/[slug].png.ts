@@ -16,14 +16,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }));
 };
 
-/** Verifica que una URL de imagen es accesible (satori la fetchea él solo) */
-async function validateImageURL(url: string): Promise<boolean> {
-  try {
-    const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(5000) });
-    return res.ok;
-  } catch {
-    return false;
-  }
+/**
+ * Convierte cualquier URL de imagen en una URL wsrv.nl en formato PNG.
+ * wsrv.nl convierte webp/avif/gif → PNG, que satori+resvg sí soportan.
+ */
+function toPngProxyURL(url: string): string {
+  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=png&w=600&h=450&fit=cover&we`;
 }
 
 export const GET: APIRoute = async ({ props }) => {
@@ -44,14 +42,13 @@ export const GET: APIRoute = async ({ props }) => {
       })
     : "";
 
-  // Convertir path relativo a absoluto (GitHub Pages = altaskur.dev)
+  // Convertir a URL absoluta y proxear por wsrv.nl → PNG (satori no soporta webp)
   let coverURL: string | null = null;
   if (post.data.coverImage) {
     const absURL = post.data.coverImage.startsWith("http")
       ? post.data.coverImage
       : `https://altaskur.dev${post.data.coverImage}`;
-    const ok = await validateImageURL(absURL);
-    if (ok) coverURL = absURL;
+    coverURL = toPngProxyURL(absURL);
   }
 
   const hasCover = !!coverURL;
