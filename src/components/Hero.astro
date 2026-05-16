@@ -81,11 +81,11 @@
 		</div>
 	</div>
 
-	<!-- Floating Action Button (AI Terminal) -->
+	<!-- Floating Action Button (Terminal) -->
 	<button
 		id="fab-ai-trigger"
 		class="fixed bottom-6 right-6 z-[90] flex h-14 w-14 items-center justify-center rounded-full bg-accent text-black shadow-lg shadow-accent/20 transition-all hover:scale-110 hover:shadow-accent/40 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 group"
-		aria-label="Abrir terminal IA"
+		aria-label="Abrir terminal"
 	>
 		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:rotate-12" aria-hidden="true">
 			<polyline points="4 17 10 11 4 5"></polyline>
@@ -189,8 +189,8 @@
 
 	// AI Terminal trigger
 	const triggerAI = () => {
-		if (typeof (window as any).openAITerminal === 'function') {
-			(window as any).openAITerminal();
+		if (typeof (window as any).openTerminal === 'function') {
+			(window as any).openTerminal();
 		}
 	};
 

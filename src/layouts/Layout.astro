@@ -3,7 +3,7 @@ import "../styles/global.css";
 import CustomCursor from "../components/CustomCursor.astro";
 import AnimatedBackground from "../components/AnimatedBackground.astro";
 import TerminalNav from "../components/TerminalNav.astro";
-import AITerminal from "../components/AITerminal.astro";
+import Terminal from "../components/Terminal.astro";
 
 interface Props {
   title: string;
@@ -105,7 +105,7 @@ const ogImage = image.startsWith("http")
     </div>
 
     <TerminalNav />
-    <AITerminal />
+    <Terminal />
     <CustomCursor />
     <main id="main-content">
       <slot />

@@ -5,7 +5,7 @@ import type Lenis from 'lenis';
 declare global {
 	interface Window {
 		lenis: Lenis;
-		openAITerminal?: () => void;
+		openTerminal?: () => void;
 		__navEntrancePlayed?: boolean;
 	}
 }
