@@ -277,6 +277,40 @@ const coverImage = post.data.coverImage ?? null;
     });
   });
 
+  // Tempoo: tracking de scroll del artículo (25 / 50 / 75 / 100%)
+  const article = document.querySelector<HTMLElement>(".prose-blog");
+  if (article) {
+    const milestones = [25, 50, 75, 100];
+    const reached = new Set<number>();
+    const title = document.title.replace(" | altaskur", "").trim();
+
+    const checkScroll = () => {
+      const articleTop = article.getBoundingClientRect().top + window.scrollY;
+      const articleH = article.offsetHeight;
+      const scrolled = window.scrollY + window.innerHeight - articleTop;
+      const pct = Math.round((scrolled / articleH) * 100);
+
+      milestones.forEach((m) => {
+        if (pct >= m && !reached.has(m)) {
+          reached.add(m);
+          (window as any).tempoo?.track("article_scroll_depth", {
+            title,
+            depth: m,
+            url: window.location.pathname,
+          });
+        }
+      });
+    };
+
+    const lenis = (window as any).lenis;
+    if (lenis) {
+      lenis.on("scroll", checkScroll);
+    } else {
+      window.addEventListener("scroll", checkScroll, { passive: true });
+    }
+    checkScroll();
+  }
+
   const headings =
     document.querySelectorAll<HTMLHeadingElement>(".prose-blog h2");
   const tocList = document.getElementById("toc-list");
