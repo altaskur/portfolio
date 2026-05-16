@@ -53,11 +53,12 @@ export const GET: APIRoute = async ({ props }) => {
 
   const hasCover = !!coverURL;
 
-  // Truncar según si hay imagen (menos espacio) o no
-  const maxTitle = hasCover ? 55 : 72;
-  const maxDesc = hasCover ? 110 : 140;
+  // Con imagen abajo siempre tenemos el ancho completo para el texto
+  const maxTitle = 65;
+  const maxDesc = hasCover ? 100 : 130;
   const safeTitle = title.length > maxTitle ? title.slice(0, maxTitle) + "…" : title;
   const safeDesc = description.length > maxDesc ? description.slice(0, maxDesc) + "…" : description;
+  const safeTitleFull = title.length > maxTitle ? title.slice(0, maxTitle) + "…" : title;
 
   // ─── Layout raíz: columna vertical (texto → imagen → footer) ───────────────
   const image = h(
@@ -112,7 +113,7 @@ export const GET: APIRoute = async ({ props }) => {
       h(
         "div",
         {
-          fontSize: 42,
+          fontSize: 36,
           fontWeight: 700,
           color: "#ffffff",
           lineHeight: 1.2,
@@ -143,7 +144,7 @@ export const GET: APIRoute = async ({ props }) => {
               borderRadius: 10,
               backgroundImage: `url(${coverURL})`,
               backgroundSize: "cover",
-              backgroundPosition: "center top",
+              backgroundPosition: "center center",
               marginBottom: 20,
             }),
           ]
