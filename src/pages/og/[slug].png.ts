@@ -54,7 +54,7 @@ export const GET: APIRoute = async ({ props }) => {
   const hasCover = !!coverURL;
 
   // Con imagen abajo siempre tenemos el ancho completo para el texto
-  const maxTitle = 65;
+  const maxTitle = 80;
   const maxDesc = hasCover ? 100 : 130;
   const safeTitle = title.length > maxTitle ? title.slice(0, maxTitle) + "…" : title;
   const safeDesc = description.length > maxDesc ? description.slice(0, maxDesc) + "…" : description;
@@ -137,10 +137,10 @@ export const GET: APIRoute = async ({ props }) => {
       // Imagen abajo (ancho completo, altura fija)
       ...(hasCover
         ? [
-            h("div", { flex: 1 }),
+            h("div", { flex: 1, minHeight: 12 }),
             h("div", {
               width: "100%",
-              height: 180,
+              height: 200,
               borderRadius: 10,
               backgroundImage: `url(${coverURL})`,
               backgroundSize: "cover",
