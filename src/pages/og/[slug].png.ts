@@ -21,7 +21,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
  * wsrv.nl convierte webp/avif/gif → PNG, que satori+resvg sí soportan.
  */
 function toPngProxyURL(url: string): string {
-  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=png&w=1200&h=500&fit=cover&a=top&we`;
+  return `https://wsrv.nl/?url=${encodeURIComponent(url)}&output=png&w=1200&we`;
 }
 
 export const GET: APIRoute = async ({ props }) => {
@@ -157,7 +157,7 @@ export const GET: APIRoute = async ({ props }) => {
                   bottom: 0,
                   backgroundImage: `url(${coverURL})`,
                   backgroundSize: "cover",
-                  backgroundPosition: "top center",
+                  backgroundPosition: "50% 0%",
                 }),
                 // Gradiente fade: transparente → fondo oscuro
                 h("div", {
