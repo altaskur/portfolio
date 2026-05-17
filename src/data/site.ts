@@ -6,7 +6,7 @@
 export const identity = {
   handle:   "altaskur",
   name:     "Isaac Julián Pavón Ruiz",
-  role:     "Frontend Engineer",
+  role:     "Frontend Developer",
   location: "Alicante, ES",
   email:    "altaskur@gmail.com",
   web:      "altaskur.dev",
@@ -21,9 +21,8 @@ export const aboutParagraphs = [
 export const skills = {
   frontend:   ["Angular 18-21", "TypeScript", "JavaScript", "HTML5", "CSS3/SCSS", "PrimeNG", "Ionic", "Astro", "SSR"],
   a11y:       ["WCAG 2.1/2.2", "Lighthouse", "WAVE", "IBM Equal Access", "ARIA", "i18n"],
-  ia:         ["Ollama", "LLMs locales", "Claude Code", "GitHub Copilot"],
   backend:    ["Node.js", "Express", "Docker"],
-  tooling:    ["ESLint", "Prettier", "Husky", "CommitLint", "Stylelint", "Storybook", "SonarQube", "GitHub Actions", "Azure DevOps"],
+  tooling:    ["ESLint", "Prettier", "Husky", "CommitLint", "Stylelint", "Storybook", "SonarQube", "GitHub Actions", "Azure DevOps", "Claude Code", "GitHub Copilot", "Ollama"],
   explorando: ["React", "Vue", "FastAPI", "PostgreSQL"],
 };
 
@@ -31,31 +30,31 @@ export const logros: { categoria: string; items: string[] }[] = [
   {
     categoria: "Angular enterprise",
     items: [
-      "Referente técnico en proyecto de largo recorrido del sector agrotech: fases sucesivas con Angular 18, 19, 20 y 21 (+ SSR), levantando la arquitectura frontend inicial y manteniéndola a lo largo de cada evolución.",
-      "Lighthouse > 90% en Performance, Accesibilidad, Best Practices y SEO en aplicación pública tras refactor completo en Angular 21 con SSR.",
-      "Continuidad técnica y conocimiento de dominio en proyecto micro-frontend de ~9 meses con equipo muy cambiante.",
+      "Desarrollo frontend en proyecto agrotech con Angular (versiones 18-21 + SSR): desde arquitectura inicial hasta mantenimiento en cada ciclo de evolución.",
+      "Lighthouse > 90% en Performance, Accesibilidad, Best Practices y SEO en aplicación pública (Angular 21 + SSR).",
+      "Micro-frontend de ~9 meses con equipo muy cambiante: entregas continuas sin perder contexto de dominio.",
     ],
   },
   {
     categoria: "Accesibilidad",
     items: [
-      "Impulso por iniciativa propia de la accesibilidad web: auditorías multi-herramienta (Lighthouse, WAVE, IBM Equal Access) y negociación con diseño para corregir violaciones WCAG.",
+      "Auditorías de accesibilidad con Lighthouse, WAVE e IBM Equal Access; corrección de violaciones WCAG coordinando con diseño.",
     ],
   },
   {
-    categoria: "Gestion y transversalidad",
+    categoria: "Equipo",
     items: [
-      "Gestión de hasta 5 proyectos en paralelo durante Q2 2025 sin romper entregas.",
+      "Hasta 5 proyectos en paralelo durante Q2 2025 sin romper entregas.",
       "Mentoring cross-equipo en Angular 19/20 a compañeros de otros proyectos.",
       "Auditoría cross-equipo con detección y escalado de problemas de backend en un proyecto externo.",
     ],
   },
   {
-    categoria: "Iniciativa tecnica",
+    categoria: "Iniciativa técnica",
     items: [
-      "Refactor completo del frontend de una aplicación interna con alta deuda técnica: análisis, planificación y ejecución autónoma desde cero.",
-      "Investigación y resolución autónoma de un problema persistente de autoplay de vídeo en tablets: análisis de causa raíz, solución aplicada y documentada.",
-      "App móvil multi-idioma para tablets con Ionic + Angular, desarrollada con fidelidad al diseño y soporte completo de i18n.",
+      "Refactor completo de una aplicación interna con alta deuda técnica: análisis y ejecución autónoma.",
+      "Debug de autoplay en tablets: análisis de causa raíz y solución documentada.",
+      "App móvil multi-idioma para tablets con Ionic + Angular, con soporte completo de i18n.",
       "Investigación técnica sobre selección de stack CSS y setup de calidad de código (Husky/ESLint/Prettier), publicada en Dev.to.",
     ],
   },

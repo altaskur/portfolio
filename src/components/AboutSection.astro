@@ -8,7 +8,7 @@ import { skills, aboutParagraphs } from "../data/site";
         <h2 id="about-heading" class="text-3xl font-bold text-white md:text-5xl">
             <span class="text-accent">02.</span> Sobre mí
         </h2>
-        <span class="hidden font-mono text-sm text-gray-500 md:block">/// WHO I AM</span>
+        <span class="hidden font-mono text-sm text-gray-500 md:block">/// sobre mí</span>
     </div>
 
     <div class="grid gap-16 md:grid-cols-2">
@@ -35,15 +35,6 @@ import { skills, aboutParagraphs } from "../data/site";
                 <div class="flex flex-wrap gap-2">
                     {skills.a11y.map(tag => (
                         <span class="rounded border border-accent/30 bg-accent/5 px-3 py-1 text-xs font-mono text-accent/80">{tag}</span>
-                    ))}
-                </div>
-            </div>
-
-            <div class="about-item opacity-0 translate-y-10">
-                <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-3">IA aplicada</p>
-                <div class="flex flex-wrap gap-2">
-                    {skills.ia.map(tag => (
-                        <span class="rounded border border-gray-700 bg-gray-900 px-3 py-1 text-xs font-mono text-gray-300">{tag}</span>
                     ))}
                 </div>
             </div>

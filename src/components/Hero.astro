@@ -18,7 +18,7 @@
 			id="hero-tagline"
 			class="hero-scroll-out font-mono text-base text-gray-400 mb-3 opacity-0"
 		>
-			Frontend Engineer <span class="text-gray-600">·</span> Angular <span
+			Frontend Developer <span class="text-gray-600">·</span> Angular <span
 				class="text-gray-600">·</span
 			> TypeScript <span class="text-gray-600">·</span> Accessibility
 		</p>
@@ -45,13 +45,6 @@
 			>
 				<span class="text-accent">></span> LOC: Alicante, ES &nbsp;·&nbsp;
 				remoto
-			</span>
-			<span
-				id="hero-devfest"
-				class="hero-scroll-out block text-sm font-mono text-gray-500 opacity-0"
-			>
-				<span class="text-accent">></span> Ponente DevFest Alicante 2025 &nbsp;·&nbsp;
-				abierto a ofertas
 			</span>
 		</div>
 
@@ -178,7 +171,7 @@
 
 	if (prefersReducedMotion) {
 		document
-			.querySelectorAll(".hero-scroll-out, #hero-loc, #hero-devfest")
+			.querySelectorAll(".hero-scroll-out")
 			.forEach((el) => {
 				(el as HTMLElement).style.opacity = "1";
 			});
@@ -260,12 +253,6 @@
 					{ opacity: 0, y: 12 },
 					{ opacity: 1, y: 0, duration: 0.45 },
 					"-=0.25",
-				)
-				.fromTo(
-					"#hero-devfest",
-					{ opacity: 0, y: 12 },
-					{ opacity: 1, y: 0, duration: 0.45 },
-					"-=0.35",
 				)
 				.fromTo(
 					"#hero-ctas",

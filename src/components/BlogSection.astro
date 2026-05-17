@@ -85,7 +85,6 @@ const allArticles = [...localArticles, ...devtoArticles]
                 <article class="lab-card relative grid gap-10 md:grid-cols-2 items-center opacity-0 translate-y-20">
                     <div class={`space-y-6 ${index % 2 === 1 ? 'md:order-2' : ''}`}>
                         <div class="flex items-center gap-4 text-accent font-mono text-sm">
-                            <span>0{index + 1}</span>
                             <span class="h-px w-10 bg-accent"></span>
                             <span>{article.tag_list.slice(0, 3).join(' / ')}</span>
                         </div>
