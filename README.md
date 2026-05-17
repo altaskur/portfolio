@@ -37,11 +37,11 @@ The site will be available at `localhost:4321`.
 
 ## 👤 About Isaac (Altaskur)
 
-Frontend Developer based in Alicante, Spain. Specializing in **Angular** and building solid, accessible products for the real world. 
+Angular developer based in Alicante, Spain. Focused on enterprise architecture, SSR and accessibility, with AI integrated in the development workflow.
 
-- 💼 Primary Focus: Scalable Frontend Architectures, RxJS, NgRx, Signals.
-- 🎨 Design: Collaborative design hand-offs with Figma.
-- ✍️ Writing: Sharing technical patterns on [Dev.to](https://dev.to/altaskur).
+- 💼 Primary Focus: Angular (18-21), architecture, SSR, WCAG accessibility.
+- 🤖 Tooling: AI-assisted development with Claude Code and GitHub Copilot.
+- ✍️ Writing: Technical posts on [Dev.to](https://dev.to/altaskur).
 
 ---
 
