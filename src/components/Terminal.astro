@@ -1,17 +1,15 @@
 ---
 import { getCollection } from "astro:content";
 import { terminalData } from "../data/terminal";
-import { talks } from "../data/site";
 
 const blogPosts = await getCollection("blog", ({ data }) => !data.draft);
 const projectPosts = await getCollection("projects");
 
-// Genera el git log dinámicamente: blog posts + charlas + entrada init fija
 const sortedPosts = [...blogPosts].sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
 );
 
-const gitLogFromPosts = sortedPosts.map((p, i) => ({
+const gitLog = sortedPosts.map((p, i) => ({
   hash: p.id
     .replace(/[^a-z0-9]/gi, "")
     .slice(0, 7)
@@ -27,29 +25,6 @@ const gitLogFromPosts = sortedPosts.map((p, i) => ({
       ? p.data.description.slice(0, 55) + "…"
       : p.data.description,
 }));
-
-const gitLogFromTalks = talks.map((t) => ({
-  hash: t.event
-    .replace(/[^a-z0-9]/gi, "")
-    .slice(0, 7)
-    .padEnd(7, "0"),
-  ref: "",
-  date: t.date,
-  msg: `talk: ${t.event}`,
-  sub: `${t.role} — "${t.title}"`,
-}));
-
-const gitLog = [
-  ...gitLogFromPosts,
-  ...gitLogFromTalks,
-  {
-    hash: "0000001",
-    ref: "(origin/vida)",
-    date: "Alicante",
-    msg: "init: empezando esto del codigo",
-    sub: "curiosidad · cafe · html en notepad++",
-  },
-];
 
 const payload = {
   ...terminalData,
