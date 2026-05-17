@@ -226,7 +226,8 @@
 		const hasDeepLink =
 			window.location.hash &&
 			window.location.hash !== "" &&
-			window.location.hash !== "#";
+			window.location.hash !== "#" &&
+			window.location.hash !== "#hero";
 		if (!hasDeepLink && window.scrollY < 50) {
 			const enter = gsap.timeline({ defaults: { ease: "power3.out" } });
 
@@ -282,7 +283,8 @@
 				ease: "back.out(1.7)",
 			});
 		} else {
-			// Deep-link o reload con scroll: FAB directamente visible
+			// Deep-link o reload con scroll: visibilidad inmediata sin animación
+			gsap.set(".hero-scroll-out", { opacity: 1, y: 0 });
 			gsap.set("#fab-ai-trigger", { scale: 1, opacity: 1 });
 		}
 
